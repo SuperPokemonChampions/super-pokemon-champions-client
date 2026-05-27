@@ -6,23 +6,24 @@ const path = require('path');
 const child_process = require("child_process");
 
 const rootDir = path.resolve(__dirname, '..');
+const serverRepoRemote = 'https://github.com/SuperPokemonChampions/Super-Pokemon-Champions.git';
 process.chdir(rootDir);
 
-if (!fs.existsSync('caches/pokemon-showdown')) {
-	child_process.execSync('git clone https://github.com/smogon/pokemon-showdown.git', {
+if (!fs.existsSync('caches/Super-Pokemon-Champions')) {
+	child_process.execSync('git clone https://github.com/SuperPokemonChampions/Super-Pokemon-Champions.git', {
 		cwd: 'caches',
 	});
 }
 
 process.stdout.write("Syncing data from Git repository... ");
-child_process.execSync('git pull', { cwd: 'caches/pokemon-showdown' });
-child_process.execSync('npm run build', { cwd: 'caches/pokemon-showdown' });
+child_process.execSync('git pull', { cwd: 'caches/Super-Pokemon-Champions' });
+child_process.execSync('npm run build', { cwd: 'caches/Super-Pokemon-Champions' });
 console.log("DONE");
 
-const Dex = require('../caches/pokemon-showdown/dist/sim/dex').Dex;
-const CompoundWordNames = require('../caches/pokemon-showdown/dist/data/aliases').CompoundWordNames;
+const Dex = require('../caches/Super-Pokemon-Champions/dist/sim/dex').Dex;
+const CompoundWordNames = require('../caches/Super-Pokemon-Champions/dist/data/aliases').CompoundWordNames;
 const toID = Dex.toID;
-process.stdout.write("Loading gen 6 data... ");
+process.stdout.write("Loading gen 9 data... ");
 Dex.includeData();
 console.log("DONE");
 
@@ -262,7 +263,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	const STADIUM = [2.04, 1.04];
 	const NATDEX = [9.1, 8.1];
 	const OTHER = [
-		9.9, 9.67, 9.6, 9.411, 9.41, 9.401, 9.4, 9.33, 9.2, -9.4, -9.401,
+		9.9, 9.88, 9.67, 9.6, 9.411, 9.41, 9.401, 9.4, 9.33, 9.2, -9.4, -9.401,
 		8.6, 8.4, 8.2, -8.4, -8.6,
 		7.1,
 		5.1,
@@ -287,6 +288,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const isGen9BH = genIdent === 9.9;
 		const isSSB = genIdent === 9.6;
 		const isChampions = genIdent === 9.67;
+		const isSuperChampions = genIdent === 9.88;
 		const genNum = Math.floor(isDoubles ? -genIdent : genIdent);
 		const isBW1 = genIdent === 5.1;
 		const isRS = genIdent === 3.1;
@@ -305,6 +307,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			if (isRS) genStr += 'rs';
 			if (isFRLG) genStr += 'frlg';
 			if (isChampions) genStr = 'champions';
+			if (isSuperChampions) genStr = 'superchampions';
 			return genStr;
 		})();
 		// process.stdout.write("" + gen + (isDoubles ? " doubles" : "") + "... ");
@@ -537,6 +540,13 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			BattleTeambuilderTable['champions'].items = items;
 			BattleTeambuilderTable['champions'].overrideTier = overrideTier;
 			BattleTeambuilderTable['champions'].formatSlices = formatSlices;
+		} else if (isSuperChampions) {
+			BattleTeambuilderTable['superchampions'] = {};
+			BattleTeambuilderTable['superchampions'].learnsets = {};
+			BattleTeambuilderTable['superchampions'].tiers = tiers;
+			BattleTeambuilderTable['superchampions'].items = items;
+			BattleTeambuilderTable['superchampions'].overrideTier = overrideTier;
+			BattleTeambuilderTable['superchampions'].formatSlices = formatSlices;
 		} else if (isVGC) {
 			BattleTeambuilderTable[gen + 'vgc'] = {};
 			BattleTeambuilderTable[gen + 'vgc'].tiers = tiers;
@@ -1046,6 +1056,17 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			BattleTeambuilderTable['champions'].learnsets[id][moveid] = '9a';
 		}
 	}
+	const SuperChampionsLearnsets = Dex.mod('superchampions').data.Learnsets;
+	for (const id in SuperChampionsLearnsets) {
+		const species = Dex.mod('superchampions').species.get(id);
+		if (species.isNonstandard) continue;
+		const learnset = SuperChampionsLearnsets[id].learnset;
+		if (!learnset) continue;
+		BattleTeambuilderTable['superchampions'].learnsets[id] = {};
+		for (const moveid in learnset) {
+			BattleTeambuilderTable['superchampions'].learnsets[id][moveid] = '9a';
+		}
+	}
 	const SSDLC1Learnsets = Dex.mod('gen8dlc1').data.Learnsets;
 	for (const id in SSDLC1Learnsets) {
 		const learnset = SSDLC1Learnsets[id].learnset;
@@ -1326,7 +1347,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	//
 
 	for (const mod of [
-		'gen3rs', 'gen3frlg', 'gen5bw1', 'gen7letsgo', 'gen8bdsp', 'gen9ssb', 'gen9legendsou', 'champions',
+		'gen3rs', 'gen3frlg', 'gen5bw1', 'gen7letsgo', 'gen8bdsp', 'gen9ssb', 'gen9legendsou', 'champions', 'superchampions',
 	]) {
 		const modDex = Dex.mod(mod);
 		const modData = modDex.data;
@@ -1400,7 +1421,7 @@ console.log("DONE");
 process.stdout.write("Building `data/pokedex.js`... ");
 
 {
-	const Pokedex = requireNoCache('../caches/pokemon-showdown/dist/data/pokedex.js').Pokedex;
+	const Pokedex = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/pokedex.js').Pokedex;
 	for (const id in Pokedex) {
 		const entry = Pokedex[id];
 		if (Dex.data.FormatsData[id]) {
@@ -1425,7 +1446,7 @@ console.log("DONE");
 process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.js`...");
 
 {
-	const Moves = requireNoCache('../caches/pokemon-showdown/dist/data/moves.js').Moves;
+	const Moves = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/moves.js').Moves;
 	for (const id in Moves) {
 		const move = Dex.moves.get(Moves[id].name);
 		if (move.desc) Moves[id].desc = move.desc;
@@ -1442,7 +1463,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const Items = requireNoCache('../caches/pokemon-showdown/dist/data/items.js').Items;
+	const Items = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/items.js').Items;
 	for (const id in Items) {
 		const item = Dex.items.get(Items[id].name);
 		if (item.desc) Items[id].desc = item.desc;
@@ -1457,7 +1478,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const Abilities = requireNoCache('../caches/pokemon-showdown/dist/data/abilities.js').Abilities;
+	const Abilities = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/abilities.js').Abilities;
 	for (const id in Abilities) {
 		const ability = Dex.abilities.get(Abilities[id].name);
 		if (ability.desc) Abilities[id].desc = ability.desc;
@@ -1472,7 +1493,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const TypeChart = requireNoCache('../caches/pokemon-showdown/dist/data/typechart.js').TypeChart;
+	const TypeChart = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/typechart.js').TypeChart;
 	const buf = 'exports.BattleTypeChart = ' + es3stringify(TypeChart) + ';';
 	fs.writeFileSync('play.pokemonshowdown.com/data/typechart.js', buf);
 }
@@ -1482,7 +1503,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const Aliases = requireNoCache('../caches/pokemon-showdown/dist/data/aliases.js').Aliases;
+	const Aliases = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/aliases.js').Aliases;
 	const buf = 'exports.BattleAliases = ' + es3stringify(Aliases) + ';';
 	fs.writeFileSync('play.pokemonshowdown.com/data/aliases.js', buf);
 }
@@ -1492,7 +1513,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const FormatsData = requireNoCache('../caches/pokemon-showdown/dist/data/formats-data.js').FormatsData;
+	const FormatsData = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/formats-data.js').FormatsData;
 	const buf = 'exports.BattleFormatsData = ' + es3stringify(FormatsData) + ';';
 	fs.writeFileSync('play.pokemonshowdown.com/data/formats-data.js', buf);
 }
@@ -1502,7 +1523,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const Formats = requireNoCache('../caches/pokemon-showdown/dist/config/formats.js').Formats;
+	const Formats = requireNoCache('../caches/Super-Pokemon-Champions/dist/config/formats.js').Formats;
 	const buf = 'exports.Formats = ' + es3stringify(Formats) + ';';
 	fs.writeFileSync('play.pokemonshowdown.com/data/formats.js', buf);
 }
@@ -1512,7 +1533,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
  *********************************************************/
 
 {
-	const Learnsets = requireNoCache('../caches/pokemon-showdown/dist/data/learnsets.js').Learnsets;
+	const Learnsets = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/learnsets.js').Learnsets;
 	const buf = 'exports.BattleLearnsets = ' + es3stringify(Learnsets) + ';';
 	fs.writeFileSync('play.pokemonshowdown.com/data/learnsets.js', buf);
 	fs.writeFileSync('play.pokemonshowdown.com/data/learnsets.json', JSON.stringify(Learnsets));
