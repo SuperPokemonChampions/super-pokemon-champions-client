@@ -607,7 +607,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		this.baseIllegalResults = null;
 
 		if (format.startsWith('gen')) {
-			const gen = (Number(format.charAt(3)) || 6);
+			const gen = (Number(format.charAt(3)) || 9);
 			format = (format.slice(4) || 'customgame') as ID;
 			this.dex = Dex.forGen(gen);
 		} else if (!format) {
