@@ -3518,7 +3518,7 @@ export class Battle {
 				this.dex = Dex.mod('gen9legendsou' as ID);
 			}
 			if (this.tier.includes(`Champions`)) {
-				this.dex = Dex.mod('champions' as ID);
+				this.dex = Dex.mod('superchampions' as ID);
 			}
 			this.log(args);
 			break;

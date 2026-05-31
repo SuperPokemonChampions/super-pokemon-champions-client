@@ -306,7 +306,6 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			if (isBW1) genStr += 'bw1';
 			if (isRS) genStr += 'rs';
 			if (isFRLG) genStr += 'frlg';
-			if (isChampions) genStr = 'champions';
 			if (isSuperChampions) genStr = 'superchampions';
 			return genStr;
 		})();
@@ -533,13 +532,6 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			BattleTeambuilderTable['gen8bdsp'].overrideTier = overrideTier;
 			BattleTeambuilderTable['gen8bdsp'].metagameBans = metagameBans;
 			BattleTeambuilderTable['gen8bdsp'].formatSlices = formatSlices;
-		} else if (isChampions) {
-			BattleTeambuilderTable['champions'] = {};
-			BattleTeambuilderTable['champions'].learnsets = {};
-			BattleTeambuilderTable['champions'].tiers = tiers;
-			BattleTeambuilderTable['champions'].items = items;
-			BattleTeambuilderTable['champions'].overrideTier = overrideTier;
-			BattleTeambuilderTable['champions'].formatSlices = formatSlices;
 		} else if (isSuperChampions) {
 			BattleTeambuilderTable['superchampions'] = {};
 			BattleTeambuilderTable['superchampions'].learnsets = {};
@@ -1045,17 +1037,6 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			BattleTeambuilderTable['gen8bdsp'].learnsets[id][moveid] = '8g';
 		}
 	}
-	const ChampionsLearnsets = Dex.mod('champions').data.Learnsets;
-	for (const id in ChampionsLearnsets) {
-		const species = Dex.mod('champions').species.get(id);
-		if (species.isNonstandard) continue;
-		const learnset = ChampionsLearnsets[id].learnset;
-		if (!learnset) continue;
-		BattleTeambuilderTable['champions'].learnsets[id] = {};
-		for (const moveid in learnset) {
-			BattleTeambuilderTable['champions'].learnsets[id][moveid] = '9a';
-		}
-	}
 	const SuperChampionsLearnsets = Dex.mod('superchampions').data.Learnsets;
 	for (const id in SuperChampionsLearnsets) {
 		const species = Dex.mod('superchampions').species.get(id);
@@ -1347,7 +1328,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	//
 
 	for (const mod of [
-		'gen3rs', 'gen3frlg', 'gen5bw1', 'gen7letsgo', 'gen8bdsp', 'gen9ssb', 'gen9legendsou', 'champions', 'superchampions',
+		'gen3rs', 'gen3frlg', 'gen5bw1', 'gen7letsgo', 'gen8bdsp', 'gen9ssb', 'gen9legendsou', 'superchampions',
 	]) {
 		const modDex = Dex.mod(mod);
 		const modData = modDex.data;
