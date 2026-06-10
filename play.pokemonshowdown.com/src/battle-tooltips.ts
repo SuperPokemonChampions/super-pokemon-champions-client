@@ -709,6 +709,8 @@ export class BattleTooltips {
 				text += `Nearly always moves last <em>(priority &minus;${-move.priority})</em>.</p><p>`;
 			} else if (move.priority === 1) {
 				text += `Usually moves first <em>(priority +${move.priority})</em>.</p><p>`;
+			} else if (move.priority === 0.1) {
+				text += `Goes before most moves <em>(priority +${move.priority})</em>.</p><p>`;
 			} else {
 				if (move.id === 'grassyglide' && this.battle.hasPseudoWeather('Grassy Terrain')) {
 					text += 'Usually moves first <em>(priority +1)</em>.</p><p>';
