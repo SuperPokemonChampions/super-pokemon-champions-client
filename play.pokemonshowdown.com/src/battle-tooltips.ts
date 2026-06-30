@@ -1083,7 +1083,7 @@ export class BattleTooltips {
 			const clientStatName = clientPokemon.boosts.spc && (statName === 'spa' || statName === 'spd') ? 'spc' : statName;
 			const boostLevel = clientPokemon.boosts[clientStatName];
 			if (boostLevel) {
-				let boostTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+				let boostTable = [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
 				if (boostLevel > 0) {
 					stats[statName] *= boostTable[boostLevel];
 				} else {
@@ -2903,7 +2903,7 @@ export class BattleStatGuesser {
 			this.formatid.includes('metronomebattle') ||
 			this.formatid.endsWith('norestrictions')
 		);
-		this.useStatPoints = this.formatid.includes('superchampions');
+		this.useStatPoints = this.formatid.includes('champions');
 		this.supportsEVs = !this.formatid.includes('letsgo') && !this.useStatPoints;
 		this.supportsAVs = !this.supportsEVs && this.formatid.endsWith('norestrictions');
 	}
@@ -3510,7 +3510,7 @@ export function BattleStatOptimizer(set: Dex.PokemonSet, formatid: ID) {
 		((formatid.endsWith('hackmons') || formatid.endsWith('bh')) && dex.gen !== 6) ||
 		formatid.includes('metronomebattle') || formatid.endsWith('norestrictions')
 	);
-	const useStatPoints = formatid.includes('superchampions');
+	const useStatPoints = formatid.includes('champions');
 	const supportsEVs = !formatid.includes('letsgo') && !useStatPoints;
 	if (!(useStatPoints || supportsEVs) || ignoreEVLimits) return null;
 

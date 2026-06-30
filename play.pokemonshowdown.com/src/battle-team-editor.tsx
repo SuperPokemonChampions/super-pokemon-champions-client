@@ -99,7 +99,7 @@ export class TeamEditorState extends PSModel {
 		this.isLetsGo = formatid.includes('letsgo');
 		this.isNatDex = formatid.includes('nationaldex') || formatid.includes('natdex');
 		this.isBDSP = formatid.includes('bdsp');
-		this.isChampions = formatid.includes('superchampions');
+		this.isChampions = formatid.includes('champions');
 		if (formatid.includes('almostanyability') || formatid.includes('aaa')) {
 			this.abilityLegality = 'hackmons';
 		} else {
@@ -119,7 +119,7 @@ export class TeamEditorState extends PSModel {
 		if (
 			formatid.includes('vgc') || formatid.includes('bss') || formatid.includes('ultrasinnohclassic') ||
 			formatid.includes('battlespot') || formatid.includes('battlestadium') || formatid.includes('battlefestival') ||
-			formatid.includes('letsgo') || formatid.includes('superchampions')
+			formatid.includes('letsgo') || formatid.includes('champions')
 		) {
 			this.defaultLevel = 50;
 		}
