@@ -2280,7 +2280,7 @@ export class BattleTooltips {
 			value.modify(2, move.name + ' + status');
 		}
 		if (move.id === 'lastrespects') {
-			value.set(Math.min(50 + 50 * pokemon.side.faintCounter));
+			value.set(Math.min(50 + 25 * pokemon.side.faintCounter));
 		}
 		if (move.id === 'punishment' && target) {
 			let boostCount = 0;
