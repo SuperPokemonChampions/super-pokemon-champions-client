@@ -2235,6 +2235,10 @@ export class BattleTooltips {
 				value.modify(2, "Acrobatics + no item");
 			}
 		}
+		if (move.id === 'hydropump' && (pokemon.getSpeciesForme() === 'Blastoise' ||
+	pokemon.getSpeciesForme() === 'Blastoise-Mega')) {
+			value.modify(1.1, 'blastoise hydro pump');
+		}
 		let variableBPCap = ['crushgrip', 'wringout'].includes(move.id) ? 120 : move.id === 'hardpress' ? 100 : undefined;
 		if (variableBPCap && target) {
 			value.set(
