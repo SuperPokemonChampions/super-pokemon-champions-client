@@ -2303,7 +2303,9 @@ export class BattleTooltips {
 			for (const boost of Object.values(pokemon.boosts)) {
 				if (boost > 0) boostCount += boost;
 			}
-			value.set(20 + 20 * boostCount);
+			let bp = 20 + 20 * boostCount;
+			if (bp > 100) bp = 100;
+			value.set(bp);
 		}
 		if (move.id === 'trumpcard') {
 			const pp = this.ppUsed(move, pokemon);
