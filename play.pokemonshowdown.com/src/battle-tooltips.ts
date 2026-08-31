@@ -2235,8 +2235,8 @@ export class BattleTooltips {
 				value.modify(2, "Acrobatics + no item");
 			}
 		}
-		if (move.id === 'hydropump' && (pokemon.getSpeciesForme() === 'Blastoise' ||
-	pokemon.getSpeciesForme() === 'Blastoise-Mega')) {
+		if (move.id === 'hydropump' && (pokemon.speciesForme === 'Blastoise' ||
+	pokemon.speciesForme === 'Blastoise-Mega')) {
 			value.modify(1.1, 'blastoise hydro pump');
 		}
 		let variableBPCap = ['crushgrip', 'wringout'].includes(move.id) ? 120 : move.id === 'hardpress' ? 100 : undefined;
@@ -2248,6 +2248,7 @@ export class BattleTooltips {
 				'approximate'
 			);
 		}
+		if (move.id === 'watershuriken' && pokemon.speciesForme === 'Greninja-Mega') value.set(75, 'mega greninja');
 		if (move.id === 'terablast' && pokemon.terastallized === 'Stellar') {
 			value.set(100, 'Tera Stellar boost');
 		}
