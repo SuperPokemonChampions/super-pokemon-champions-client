@@ -289,14 +289,11 @@ export class MainMenuRoom extends PSRoom {
 					}
 				}
 				let id = toID(name);
-				let isTeambuilderFormat = !team && !name.endsWith('Custom Game');
+				let isTeambuilderFormat = !team;
 				let teambuilderFormat = '' as ID;
 				let teambuilderFormatName = '';
 				if (isTeambuilderFormat) {
 					teambuilderFormatName = name;
-					if (!id.startsWith('gen')) {
-						teambuilderFormatName = '[Gen 6] ' + name;
-					}
 					let parenPos = teambuilderFormatName.indexOf('(');
 					if (parenPos > 0 && name.endsWith(')')) {
 						// variation of existing tier

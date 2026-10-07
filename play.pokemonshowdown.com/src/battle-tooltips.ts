@@ -709,6 +709,8 @@ export class BattleTooltips {
 				text += `Nearly always moves last <em>(priority &minus;${-move.priority})</em>.</p><p>`;
 			} else if (move.priority === 1) {
 				text += `Usually moves first <em>(priority +${move.priority})</em>.</p><p>`;
+			} else if (move.priority === 0.1) {
+				text += `Goes before most moves <em>(priority +${move.priority})</em>.</p><p>`;
 			} else {
 				if (move.id === 'grassyglide' && this.battle.hasPseudoWeather('Grassy Terrain')) {
 					text += 'Usually moves first <em>(priority +1)</em>.</p><p>';
@@ -1081,7 +1083,7 @@ export class BattleTooltips {
 			const clientStatName = clientPokemon.boosts.spc && (statName === 'spa' || statName === 'spd') ? 'spc' : statName;
 			const boostLevel = clientPokemon.boosts[clientStatName];
 			if (boostLevel) {
-				let boostTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+				let boostTable = [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
 				if (boostLevel > 0) {
 					stats[statName] *= boostTable[boostLevel];
 				} else {
@@ -2233,6 +2235,10 @@ export class BattleTooltips {
 				value.modify(2, "Acrobatics + no item");
 			}
 		}
+		if (move.id === 'hydropump' && (pokemon.speciesForme === 'Blastoise' ||
+	pokemon.speciesForme === 'Blastoise-Mega')) {
+			value.modify(1.1, 'blastoise hydro pump');
+		}
 		let variableBPCap = ['crushgrip', 'wringout'].includes(move.id) ? 120 : move.id === 'hardpress' ? 100 : undefined;
 		if (variableBPCap && target) {
 			value.set(
@@ -2242,6 +2248,7 @@ export class BattleTooltips {
 				'approximate'
 			);
 		}
+		if (move.id === 'watershuriken' && pokemon.speciesForme === 'Greninja-Mega') value.set(75, 'mega greninja');
 		if (move.id === 'terablast' && pokemon.terastallized === 'Stellar') {
 			value.set(100, 'Tera Stellar boost');
 		}
@@ -2278,7 +2285,7 @@ export class BattleTooltips {
 			value.modify(2, move.name + ' + status');
 		}
 		if (move.id === 'lastrespects') {
-			value.set(Math.min(50 + 50 * pokemon.side.faintCounter));
+			value.set(Math.min(50 + 25 * pokemon.side.faintCounter));
 		}
 		if (move.id === 'punishment' && target) {
 			let boostCount = 0;
@@ -2297,7 +2304,9 @@ export class BattleTooltips {
 			for (const boost of Object.values(pokemon.boosts)) {
 				if (boost > 0) boostCount += boost;
 			}
-			value.set(20 + 20 * boostCount);
+			let bp = 20 + 20 * boostCount;
+			if (bp > 100) bp = 100;
+			value.set(bp);
 		}
 		if (move.id === 'trumpcard') {
 			const pp = this.ppUsed(move, pokemon);

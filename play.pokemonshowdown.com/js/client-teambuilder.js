@@ -33,8 +33,8 @@
 				if (this.curTeam.format.includes('legends')) {
 					this.curTeam.dex = Dex.mod('gen9legendsou');
 				}
-				if (this.curTeam.format.includes('champions')) {
-					this.curTeam.dex = Dex.mod('champions');
+				if (this.curTeam.format.includes('superchampions')) {
+					this.curTeam.dex = Dex.mod('superchampions');
 				}
 				Storage.activeSetList = this.curSetList;
 			}
@@ -764,8 +764,8 @@
 			if (this.curTeam.format.includes('legends')) {
 				this.curTeam.dex = Dex.mod('gen9legendsou');
 			}
-			if (this.curTeam.format.includes('champions')) {
-				this.curTeam.dex = Dex.mod('champions');
+			if (this.curTeam.format.includes('superchampions')) {
+				this.curTeam.dex = Dex.mod('superchampions');
 			}
 			Storage.activeSetList = this.curSetList = Storage.unpackTeam(this.curTeam.team);
 			this.curTeamIndex = i;
@@ -1294,7 +1294,7 @@
 			var baseFormat = this.curTeam.format;
 			if (baseFormat.substr(-5) === 'draft') baseFormat = baseFormat.substr(0, baseFormat.length - 5);
 			var species = this.curTeam.dex.species.get(set.species);
-			var isChampions = baseFormat.includes('champions');
+			var isSuperChampions = baseFormat.includes('superchampions');
 			var isLetsGo = baseFormat.includes('letsgo');
 			var isBDSP = baseFormat.includes('bdsp');
 			var isNatDex = baseFormat.includes('nationaldex') || baseFormat.includes('natdex');
@@ -1362,7 +1362,7 @@
 						buf += '<span class="detailcell"><label>Gmax</label>' + (set.gigantamax || species.forme === 'Gmax' ? 'Yes' : 'No') + '</span>';
 					}
 				}
-				if (this.curTeam.gen === 9 && !isChampions) {
+				if (this.curTeam.gen === 9 && !isSuperChampions) {
 					buf += '<span class="detailcell"><label>Tera Type</label>' + (set.teraType || species.requiredTeraType || species.types[0]) + '</span>';
 				}
 			}
@@ -1401,7 +1401,7 @@
 
 			// stats
 			buf += '<div class="setcol setcol-stats"><div class="setrow"><label>Stats</label><button class="textbox setstats" name="stats">';
-			buf += '<span class="statrow statrow-head"><label></label> <span class="statgraph"></span> <em>' + (isChampions ? 'Points' : !isLetsGo ? 'EV' : 'AV') + '</em></span>';
+			buf += '<span class="statrow statrow-head"><label></label> <span class="statgraph"></span> <em>' + (isSuperChampions ? 'Points' : !isLetsGo ? 'EV' : 'AV') + '</em></span>';
 			var stats = {};
 			var defaultEV = (this.curTeam.gen > 2 ? 0 : 252);
 			for (var j in BattleStatNames) {
@@ -1415,7 +1415,7 @@
 					evBuf += '<small>&minus;</small>';
 				}
 				var highestStat = j === 'hp' ? 714 : 499;
-				if (isChampions || isVGC) {
+				if (isSuperChampions || isVGC) {
 					highestStat = j === 'hp' ? 362 : 252;
 				}
 				if (isLC) {
@@ -1635,8 +1635,8 @@
 			if (this.curTeam.format.includes('legends')) {
 				this.curTeam.dex = Dex.mod('gen9legendsou');
 			}
-			if (this.curTeam.format.includes('champions')) {
-				this.curTeam.dex = Dex.mod('champions');
+			if (this.curTeam.format.includes('superchampions')) {
+				this.curTeam.dex = Dex.mod('superchampions');
 			}
 			this.save();
 			if (this.curTeam.gen === 5 && !Dex.loadedSpriteData['bw']) Dex.loadSpriteData('bw');
@@ -1910,7 +1910,7 @@
 			curSet.name = this.curSet.name || undefined;
 
 			// never preserve current set tera, even if smogon set used default
-			if (this.curSet.gen === 9 && !this.curTeam.format.includes('champions')) {
+			if (this.curSet.gen === 9 && !this.curTeam.format.includes('superchampions')) {
 				curSet.teraType = sampleSet.teraType || species.requiredTeraType || species.types[0];
 			}
 
@@ -2081,7 +2081,7 @@
 
 			var baseFormat = this.curTeam.format;
 			if (baseFormat.substr(-5) === 'draft') baseFormat = baseFormat.substr(0, baseFormat.length - 5);
-			var usesStatPoints = baseFormat.includes('champions');
+			var usesStatPoints = baseFormat.includes('superchampions');
 			var supportsEVs = !baseFormat.includes('letsgo');
 			var isVGC = baseFormat.includes('battlespot') || baseFormat.includes('bss') ||
 				baseFormat.includes('vgc') || baseFormat.includes('battlefestival');
@@ -2367,7 +2367,7 @@
 
 			var baseFormat = this.curTeam.format;
 			if (baseFormat.substr(-5) === 'draft') baseFormat = baseFormat.substr(0, baseFormat.length - 5);
-			var usesStatPoints = baseFormat.includes('champions');
+			var usesStatPoints = baseFormat.includes('superchampions');
 			var supportsEVs = !baseFormat.includes('letsgo') && !usesStatPoints;
 			// var supportsAVs = !supportsEVs && baseFormat.endsWith('norestrictions');
 			var defaultEV = this.curTeam.gen <= 2 ? 252 : 0;
@@ -2674,7 +2674,7 @@
 			var inputName = '';
 			inputName = e.currentTarget.name;
 			var val = Math.abs(parseInt(e.currentTarget.value, 10));
-			var usesStatPoints = this.curTeam.format.includes('champions');
+			var usesStatPoints = this.curTeam.format.includes('superchampions');
 			var supportsEVs = !this.curTeam.format.includes('letsgo') && !usesStatPoints;
 			var supportsAVs = !supportsEVs && this.curTeam.format.endsWith('norestrictions');
 			var set = this.curSet;
@@ -2797,7 +2797,7 @@
 			var val = +slider.value;
 			var originalVal = val;
 			var result = this.getStat(stat, set, val);
-			var usesStatPoints = this.curTeam.format.includes('champions');
+			var usesStatPoints = this.curTeam.format.includes('superchampions');
 			var supportsEVs = !this.curTeam.format.includes('letsgo') && !usesStatPoints;
 			var supportsAVs = !supportsEVs && this.curTeam.format.endsWith('norestrictions');
 			var step = usesStatPoints ? 1 : 4;
@@ -2899,7 +2899,7 @@
 		updateDetailsForm: function () {
 			var buf = '';
 			var set = this.curSet;
-			var isChampions = this.curTeam.format.includes('champions');
+			var isSuperChampions = this.curTeam.format.includes('superchampions');
 			var isLetsGo = this.curTeam.format.includes('letsgo');
 			var isBDSP = this.curTeam.format.includes('bdsp');
 			var isNatDex = this.curTeam.format.includes('nationaldex') || this.curTeam.format.includes('natdex');
@@ -2913,7 +2913,7 @@
 				'<input type="number" min="1" max="100" step="1" name="level" value="' +
 				(typeof set.level === 'number' ? set.level : 100) +
 				'" class="textbox inputform numform"' +
-				(isChampions ? ' disabled' : '') +
+				(isSuperChampions ? ' disabled' : '') +
 				' /></div></div>';
 
 			if (this.curTeam.gen > 1) {
@@ -2982,7 +2982,7 @@
 				buf += '</select></div></div>';
 			}
 
-			if (this.curTeam.gen === 9 && !isChampions) {
+			if (this.curTeam.gen === 9 && !isSuperChampions) {
 				buf += '<div class="formrow"><label class="formlabel" title="Tera Type">Tera Type:</label><div>';
 				buf += '<select name="teratype" class="button">';
 				var types = Dex.types.all();
@@ -3006,7 +3006,7 @@
 			var set = this.curSet;
 			if (!set) return;
 			var species = this.curTeam.dex.species.get(set.species);
-			var isChampions = this.curTeam.format.includes('champions');
+			var isSuperChampions = this.curTeam.format.includes('superchampions');
 			var isLetsGo = this.curTeam.format.includes('letsgo');
 			var isBDSP = this.curTeam.format.includes('bdsp');
 			var isNatDex = this.curTeam.format.includes('nationaldex') || this.curTeam.format.includes('natdex');
@@ -3070,7 +3070,7 @@
 
 			// Tera type
 			var teraType = this.$chart.find('select[name=teratype]').val();
-			if (!isChampions && Dex.types.isName(teraType)) {
+			if (!isSuperChampions && Dex.types.isName(teraType)) {
 				set.teraType = teraType || species.requiredTeraType || species.types[0];
 			} else {
 				delete set.teraType;
@@ -3101,7 +3101,7 @@
 						buf += '<span class="detailcell"><label>Gmax</label>' + (set.gigantamax || species.forme === 'Gmax' ? 'Yes' : 'No') + '</span>';
 					}
 				}
-				if (this.curTeam.gen === 9 && !isChampions) {
+				if (this.curTeam.gen === 9 && !isSuperChampions) {
 					buf += '<span class="detailcell"><label>Tera Type</label>' + (set.teraType || species.requiredTeraType || species.types[0]) + '</span>';
 				}
 			}
@@ -3529,7 +3529,7 @@
 
 			if (this.curTeam.format.includes('1v1') || this.curTeam.format.includes('categoryswap') ||
 				this.curTeam.format.includes('partnersincrime') || this.curTeam.format.includes('typesplit') ||
-				this.curTeam.format.includes('champions')) return;
+				this.curTeam.format.includes('superchampions')) return;
 			if (this.curTeam.format === 'gen7hiddentype') return;
 
 			var minAtk = true;
@@ -3616,7 +3616,7 @@
 				if (baseFormat.substr(-5) === 'draft') baseFormat = baseFormat.substr(0, baseFormat.length - 5);
 				if (!baseFormat) baseFormat = 'ou';
 				if (this.curTeam && this.curTeam.format) {
-					if (baseFormat.substr(0, 9) === 'champions' || baseFormat.substr(0, 10) === 'battlespot' ||
+					if (baseFormat.substr(0, 9) === 'superchampions' || baseFormat.substr(0, 10) === 'battlespot' ||
 						baseFormat.substr(0, 3) === 'bss' || baseFormat.substr(0, 3) === 'vgc' ||
 						baseFormat.substr(0, 14) === 'battlefestival') set.level = 50;
 					if (baseFormat.startsWith('lc') || baseFormat.endsWith('lc')) set.level = 5;
@@ -3655,7 +3655,7 @@
 		// Stat calculator
 
 		getStat: function (stat, set, evOverride, natureOverride) {
-			var usesStatPoints = this.curTeam.format.includes('champions');
+			var usesStatPoints = this.curTeam.format.includes('superchampions');
 			var supportsEVs = !this.curTeam.format.includes('letsgo') && !usesStatPoints;
 			var supportsAVs = !supportsEVs;
 			if (!set) set = this.curSet;

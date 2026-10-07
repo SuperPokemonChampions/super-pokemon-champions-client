@@ -1284,7 +1284,8 @@
 					"S/V Singles": true, "S/V Doubles": true, "Unofficial Metagames": true, "National Dex": true, "Ladder Spotlight": true,
 					"Other Metagames": true,
 					// For AFD
-					"Random Meta of the Decade": true
+					"Random Meta of the Decade": true,
+					"Super Pokémon Champions": true
 				};
 			}
 			if (!this.starred) this.starred = Storage.prefs('starredformats') || {};
