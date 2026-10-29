@@ -78,6 +78,7 @@
 			// teambuilder events
 			'click .utilichart a': 'chartClick',
 			'keydown .chartinput': 'chartKeydown',
+			'input .chartinput': 'chartInput',
 			'keyup .chartinput': 'chartKeyup',
 			'focus .chartinput': 'chartFocus',
 			'blur .chartinput': 'chartChange',
@@ -3257,7 +3258,26 @@
 				}
 			}
 		},
-		chartKeyup: function () {
+		chartInput: function (e) {
+			this.updateChartFromInput(e);
+		},
+		chartKeyup: function (e) {
+			this.updateChartFromInput(e);
+		},
+		updateChartFromInput: function (e) {
+			var name = e.currentTarget.name;
+			var type = this.chartTypes[name];
+			if (!type || !this.curSet) return;
+
+			// Keep the active search type tied to the field receiving edits. The
+			// chart can otherwise retain a stale type after switching team tabs or
+			// restoring an incomplete set, leaving the results unfiltered.
+			if (this.curChartName !== name || this.curChartType !== type) {
+				this.curChartName = name;
+				this.curChartType = type;
+				this.updateChart(false, true);
+				return;
+			}
 			this.updateChart();
 		},
 		chartFocus: function (e) {
