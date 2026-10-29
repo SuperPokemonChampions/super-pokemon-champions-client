@@ -382,6 +382,9 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					return 'Regular';
 				}
 				if (isChampions && species.isNonstandard) return 'Illegal';
+				// Champions Singles allows every species, including past and unreleased species.
+				// Keep species marked Illegal in the source tier table visible in the Teambuilder.
+				if (isChampions && species.tier === 'Illegal') return 'Regular';
 				if (isRS) {
 					if (species.isNonstandard) {
 						if (species.isNonstandard === 'Unobtainable') return 'Unreleased';
@@ -1051,14 +1054,13 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	const championsLearnsets = BattleTeambuilderTable['champions'].learnsets;
 	const auraSphereExceptions = new Set([
 		'aerodactyl', 'alakazam', 'mukalola', 'exeggutoralola', 'amoonguss', 'bewear', 'blacephalon',
-		'braviary', 'chandelure', 'cloyster', 'diggersby', 'dragonite', 'druddigon', 'electrode',
-		'ekans', 'excadrill', 'exeggutor', 'feraligatr', 'forretress', 'furret', 'galvantula',
-		'weezinggalar', 'garbodor', 'gengar', 'golduck', 'golurk', 'grapploct', 'guzzlord',
+		'braviary', 'chandelure', 'cloyster', 'diggersby', 'dragonite', 'druddigon', 'electrode', 'eternatus',
+		'excadrill', 'exeggutor', 'feraligatr', 'forretress', 'furret', 'weezinggalar', 'garbodor', 'gengar',
+		'gholdengo', 'golurk', 'grapploct', 'guzzlord',
 		'krookodile', 'magmortar', 'malamar', 'melmetal', 'mudsdale', 'muk', 'noivern', 'omastar',
 		'palossand', 'parasect', 'pinsir', 'polteageist', 'rampardos', 'relicanth', 'reuniclus',
 		'rhydon', 'rhyperior', 'runerigus', 'shuckle', 'slaking', 'snorlax', 'spiritomb', 'starmie',
-		'stonjourner', 'swampert', 'talonflame', 'toxtricity', 'tyranitar', 'typhlosion', 'vileplume',
-		'weezing',
+		'stonjourner', 'swampert', 'talonflame', 'toxtricity', 'tyranitar', 'vileplume', 'weezing',
 	]);
 	const endeavorExceptions = new Set([
 		'shedinja', 'metapod', 'kakuna', 'silcoon', 'cascoon', 'spewpa', 'unown', 'porygon', 'porygon2',
@@ -1069,7 +1071,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	]);
 	const workUpExceptions = new Set([
 		'aegislash', 'alcremie', 'bronzong', 'bronzor', 'chandelure', 'cofagrigus', 'cosmoem', 'cosmog',
-		'ditto', 'drifblim', 'dusknoir', 'grimer', 'honedge', 'klang', 'klink', 'klinklang', 'komala',
+		'ditto', 'doublade', 'duosion', 'grimer', 'honedge', 'klang', 'klink', 'klinklang', 'komala',
 		'lampent', 'litwick', 'magnemite', 'magneton', 'magnezone', 'milcery', 'minior', 'muk',
 		'polteageist', 'poltchageist', 'pyukumuku', 'reuniclus', 'runerigus', 'shuckle', 'sinistcha',
 		'sinistea', 'slaking', 'solosis', 'wynaut', 'wobbuffet',
@@ -1079,11 +1081,21 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const species = championsDex.species.get(id);
 		const learnset = championsLearnsets[id];
 		const fullLearnset = championsDex.species.getFullLearnset(id);
-		if (!auraSphereExceptions.has(id) && fullLearnset.some(entry => entry.learnset?.focusblast)) {
+		if (auraSphereExceptions.has(id)) {
+			delete learnset.aurasphere;
+		} else if (fullLearnset.some(entry => entry.learnset?.focusblast)) {
 			learnset.aurasphere = '9a';
 		}
-		if (!endeavorExceptions.has(id) && !species.types.includes('Ghost')) learnset.endeavor = '9a';
-		if (!workUpExceptions.has(id)) learnset.workup = '9a';
+		if (endeavorExceptions.has(id) || species.types.includes('Ghost')) {
+			delete learnset.endeavor;
+		} else {
+			learnset.endeavor = '9a';
+		}
+		if (workUpExceptions.has(id)) {
+			delete learnset.workup;
+		} else {
+			learnset.workup = '9a';
+		}
 	}
 	const SSDLC1Learnsets = Dex.mod('gen8dlc1').data.Learnsets;
 	for (const id in SSDLC1Learnsets) {
