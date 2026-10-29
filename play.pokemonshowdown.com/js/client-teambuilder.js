@@ -40,7 +40,7 @@
 					this.curTeam.dex = Dex.mod('superchampions');
 				}
 				if (this.curTeam.format.includes('champions')) {
-					for (var set of this.curSetList) set.level = 50;
+					for (var set of this.curSetList) if (!set.level) set.level = 50;
 				}
 				Storage.activeSetList = this.curSetList;
 			}
@@ -781,8 +781,10 @@
 			Storage.activeSetList = this.curSetList = Storage.unpackTeam(this.curTeam.team);
 			if (this.curTeam.format.includes('champions')) {
 				for (var set of this.curSetList) {
-					if (set.level !== 50) normalizedChampionTeam = true;
-					set.level = 50;
+					if (!set.level) {
+						set.level = 50;
+						normalizedChampionTeam = true;
+					}
 				}
 			}
 			this.curTeamIndex = i;
@@ -1659,7 +1661,7 @@
 				this.curTeam.dex = Dex.mod('superchampions');
 			}
 			if (this.curTeam.format.includes('champions')) {
-				for (var set of this.curSetList) set.level = 50;
+				for (var set of this.curSetList) if (!set.level) set.level = 50;
 			}
 			this.save();
 			if (this.curTeam.gen === 5 && !Dex.loadedSpriteData['bw']) Dex.loadSpriteData('bw');
@@ -2923,6 +2925,7 @@
 			var buf = '';
 			var set = this.curSet;
 			var isSuperChampions = this.curTeam.format.includes('superchampions');
+			var isChampions = this.curTeam.format.includes('champions');
 			var isLetsGo = this.curTeam.format.includes('letsgo');
 			var isBDSP = this.curTeam.format.includes('bdsp');
 			var isNatDex = this.curTeam.format.includes('nationaldex') || this.curTeam.format.includes('natdex');
@@ -2934,9 +2937,8 @@
 
 			buf += '<div class="formrow"><label class="formlabel">Level:</label><div>' +
 				'<input type="number" min="1" max="100" step="1" name="level" value="' +
-				(typeof set.level === 'number' ? set.level : 100) +
+				(typeof set.level === 'number' ? set.level : (isChampions ? 50 : 100)) +
 				'" class="textbox inputform numform"' +
-				(isSuperChampions ? ' disabled' : '') +
 				' /></div></div>';
 
 			if (this.curTeam.gen > 1) {
@@ -3030,13 +3032,14 @@
 			if (!set) return;
 			var species = this.curTeam.dex.species.get(set.species);
 			var isSuperChampions = this.curTeam.format.includes('superchampions');
+			var isChampions = this.curTeam.format.includes('champions');
 			var isLetsGo = this.curTeam.format.includes('letsgo');
 			var isBDSP = this.curTeam.format.includes('bdsp');
 			var isNatDex = this.curTeam.format.includes('nationaldex') || this.curTeam.format.includes('natdex');
 
 			// level
 			var level = parseInt(this.$chart.find('input[name=level]').val(), 10);
-			if (!level || level > 100 || level < 1) level = 100;
+			if (!level || level > 100 || level < 1) level = isChampions ? 50 : 100;
 			if (level !== 100 || set.level) set.level = level;
 
 			// happiness
@@ -3639,7 +3642,7 @@
 				if (baseFormat.substr(-5) === 'draft') baseFormat = baseFormat.substr(0, baseFormat.length - 5);
 				if (!baseFormat) baseFormat = 'ou';
 				if (this.curTeam && this.curTeam.format) {
-					if (baseFormat.substr(0, 9) === 'superchampions' || baseFormat.substr(0, 10) === 'battlespot' ||
+					if (baseFormat.includes('champions') || baseFormat.substr(0, 10) === 'battlespot' ||
 						baseFormat.substr(0, 3) === 'bss' || baseFormat.substr(0, 3) === 'vgc' ||
 						baseFormat.substr(0, 14) === 'battlefestival') set.level = 50;
 					if (baseFormat.startsWith('lc') || baseFormat.endsWith('lc')) set.level = 5;
