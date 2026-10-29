@@ -979,10 +979,11 @@ export class ModdedDex {
 	};
 	pokeballs: string[] | null = null;
 	constructor(modid: ID) {
-		this.modid = modid;
+		// Both format IDs use the same custom Champions move/species tables.
+		this.modid = modid === 'superchampions' ? 'champions' as ID : modid;
 		let gen = parseInt(modid.charAt(3), 10);
-		if (this.modid === 'superchampions') gen = 9;
-		if ((modid !== 'superchampions' && !modid.startsWith('gen')) || !gen) throw new Error("Unsupported modid");
+		if (this.modid === 'champions') gen = 9;
+		if ((this.modid !== 'champions' && !modid.startsWith('gen')) || !gen) throw new Error("Unsupported modid");
 		this.gen = gen;
 	}
 	moves = {

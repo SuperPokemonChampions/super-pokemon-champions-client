@@ -8,6 +8,7 @@
 import { PS, type Team } from "./client-main";
 import { PSIcon, PSPanelWrapper, PSRoomPanel } from "./panels";
 import { Dex, toID, type ID } from "./battle-dex";
+import { BattleLog } from "./battle-log";
 import { Teams } from "./battle-teams";
 
 export class PSTeambuilder {
@@ -158,8 +159,13 @@ export function TeamBox(props: {
 			<em>(empty {team.isBox ? 'box' : 'team'})</em>
 		);
 		let format = team.format as string;
-		if (format.startsWith(Dex.modid)) format = format.slice(4);
-		format = (format ? `[${format}] ` : ``) + (team.folder ? `${team.folder}/` : ``);
+		if (format.includes('champions')) {
+			format = BattleLog.formatName(format);
+		} else {
+			if (format.startsWith(Dex.modid)) format = format.slice(4);
+			if (format) format = `[${format}]`;
+		}
+		format = (format ? `${format} ` : ``) + (team.folder ? `${team.folder}/` : ``);
 		contents = [
 			<strong>{team.isBox && <i class="fa fa-archive"></i>} {format && <span>{format}</span>}{team.name}</strong>,
 			<small>{team.iconCache}</small>,
