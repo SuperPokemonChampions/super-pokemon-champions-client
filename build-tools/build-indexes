@@ -381,10 +381,9 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					if (species.tier === 'LC') return 'LC';
 					return 'Regular';
 				}
-				if (isChampions && species.isNonstandard) return 'Illegal';
-				// Champions Singles allows every species, including past and unreleased species.
-				// Keep species marked Illegal in the source tier table visible in the Teambuilder.
-				if (isChampions && species.tier === 'Illegal') return 'Regular';
+				// Singles 6v6 permits every species, including past and unreleased
+				// Pokémon; don't carry standard Gen 9 legality into this format.
+				if (isChampions) return 'Regular';
 				if (isRS) {
 					if (species.isNonstandard) {
 						if (species.isNonstandard === 'Unobtainable') return 'Unreleased';

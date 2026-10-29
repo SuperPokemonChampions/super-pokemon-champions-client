@@ -1027,6 +1027,10 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 	getBaseResults(): SearchRow[] {
 		const format = this.format;
 		if (!format) return this.getDefaultResults();
+		// Singles 6v6 in Super Champions has no species restrictions. Avoid
+		// applying the standard Gen 9 tier slices, which incorrectly mark
+		// Pokémon such as Arceus and Floatzel as illegal in the teambuilder.
+		if (this.formatType === 'champions') return this.getDefaultResults();
 		const isVGCOrBS = format.startsWith('battlespot') || format.startsWith('bss') ||
 			format.startsWith('battlestadium') || format.startsWith('vgc') || format === '4v4doublesuu';
 		const isHackmons = format.includes('hackmons') || format.endsWith('bh');
