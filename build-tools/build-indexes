@@ -1048,6 +1048,43 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			BattleTeambuilderTable['champions'].learnsets[id][moveid] = '9a';
 		}
 	}
+	const championsLearnsets = BattleTeambuilderTable['champions'].learnsets;
+	const auraSphereExceptions = new Set([
+		'aerodactyl', 'alakazam', 'mukalola', 'exeggutoralola', 'amoonguss', 'bewear', 'blacephalon',
+		'braviary', 'chandelure', 'cloyster', 'diggersby', 'dragonite', 'druddigon', 'electrode',
+		'ekans', 'excadrill', 'exeggutor', 'feraligatr', 'forretress', 'furret', 'galvantula',
+		'weezinggalar', 'garbodor', 'gengar', 'golduck', 'golurk', 'grapploct', 'guzzlord',
+		'krookodile', 'magmortar', 'malamar', 'melmetal', 'mudsdale', 'muk', 'noivern', 'omastar',
+		'palossand', 'parasect', 'pinsir', 'polteageist', 'rampardos', 'relicanth', 'reuniclus',
+		'rhydon', 'rhyperior', 'runerigus', 'shuckle', 'slaking', 'snorlax', 'spiritomb', 'starmie',
+		'stonjourner', 'swampert', 'talonflame', 'toxtricity', 'tyranitar', 'typhlosion', 'vileplume',
+		'weezing',
+	]);
+	const endeavorExceptions = new Set([
+		'shedinja', 'metapod', 'kakuna', 'silcoon', 'cascoon', 'spewpa', 'unown', 'porygon', 'porygon2',
+		'porygonz', 'magearna', 'cosmog', 'cosmoem', 'togedemaru', 'ditto', 'grimer', 'muk', 'slugma',
+		'magcargo', 'gulpin', 'swalot', 'castform', 'milcery', 'alcremie', 'magnemite', 'magneton',
+		'magnezone', 'voltorb', 'electrode', 'baltoy', 'claydol', 'bronzor', 'bronzong', 'klink', 'klang',
+		'klinklang', 'klefki', 'orthworm', 'sunkern', 'parasect', 'bounsweet', 'slakoth', 'slaking', 'komala',
+	]);
+	const workUpExceptions = new Set([
+		'aegislash', 'alcremie', 'bronzong', 'bronzor', 'chandelure', 'cofagrigus', 'cosmoem', 'cosmog',
+		'ditto', 'drifblim', 'dusknoir', 'grimer', 'honedge', 'klang', 'klink', 'klinklang', 'komala',
+		'lampent', 'litwick', 'magnemite', 'magneton', 'magnezone', 'milcery', 'minior', 'muk',
+		'polteageist', 'poltchageist', 'pyukumuku', 'reuniclus', 'runerigus', 'shuckle', 'sinistcha',
+		'sinistea', 'slaking', 'solosis', 'wynaut', 'wobbuffet',
+	]);
+	const championsDex = Dex.mod('champions');
+	for (const id in championsLearnsets) {
+		const species = championsDex.species.get(id);
+		const learnset = championsLearnsets[id];
+		const fullLearnset = championsDex.species.getFullLearnset(id);
+		if (!auraSphereExceptions.has(id) && fullLearnset.some(entry => entry.learnset?.focusblast)) {
+			learnset.aurasphere = '9a';
+		}
+		if (!endeavorExceptions.has(id) && !species.types.includes('Ghost')) learnset.endeavor = '9a';
+		if (!workUpExceptions.has(id)) learnset.workup = '9a';
+	}
 	const SSDLC1Learnsets = Dex.mod('gen8dlc1').data.Learnsets;
 	for (const id in SSDLC1Learnsets) {
 		const learnset = SSDLC1Learnsets[id].learnset;
@@ -1235,7 +1272,8 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		'abilities', 'baseStats', 'cosmeticFormes', 'isNonstandard', 'requiredItems', 'types', 'unreleasedHidden',
 	];
 	const overrideMoveKeys = [
-		'accuracy', 'basePower', 'category', 'desc', 'flags', 'isNonstandard', 'pp', 'priority', 'shortDesc', 'target', 'type',
+		'accuracy', 'basePower', 'category', 'desc', 'flags', 'isNonstandard', 'pp', 'priority', 'secondary', 'secondaries',
+		'shortDesc', 'target', 'type',
 	];
 	const overrideAbilityKeys = ['desc', 'flags', 'isNonstandard', 'rating', 'shortDesc'];
 	const overrideItemKeys = ['desc', 'fling', 'isNonstandard', 'naturalGift', 'shortDesc'];
