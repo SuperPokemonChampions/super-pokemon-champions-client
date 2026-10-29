@@ -366,7 +366,11 @@ class TeambuilderPanel extends PSRoomPanel<TeambuilderRoom> {
 			let isBox = false;
 			if (bracketIndex >= 0) {
 				format = name.slice(1, bracketIndex);
-				if (!format.startsWith('gen')) format = 'gen6' + format;
+				if (format.startsWith('gen6') && format.slice(4).includes('champions')) {
+					format = format.slice(4);
+				} else if (!format.startsWith('gen') && !format.includes('champions')) {
+					format = 'gen6' + format;
+				}
 				if (format.endsWith('-box')) {
 					format = format.slice(0, -4);
 					isBox = true;

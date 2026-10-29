@@ -100,6 +100,9 @@ export class TeamEditorState extends PSModel {
 		this.isNatDex = formatid.includes('nationaldex') || formatid.includes('natdex');
 		this.isBDSP = formatid.includes('bdsp');
 		this.isChampions = formatid.includes('champions');
+		if (this.isChampions) {
+			for (const set of this.sets) set.level = 50;
+		}
 		if (formatid.includes('almostanyability') || formatid.includes('aaa')) {
 			this.abilityLegality = 'hackmons';
 		} else {
@@ -224,6 +227,7 @@ export class TeamEditorState extends PSModel {
 			set.ivs = undefined;
 			set.nature = 'Jolly';
 		}
+		if (this.isChampions) set.level = 50;
 	}
 	deleteSet(index: number) {
 		if (this.sets.length <= index) return;
@@ -2993,7 +2997,12 @@ class DetailsForm extends preact.Component<{
 	};
 	changeLevel = (ev: Event) => {
 		const target = ev.currentTarget as HTMLInputElement;
-		const { set } = this.props;
+		const { editor, set } = this.props;
+		if (editor.isChampions) {
+			set.level = 50;
+			this.props.onChange();
+			return;
+		}
 		if (target.value) {
 			set.level = parseInt(target.value.trim());
 		} else {
@@ -3080,7 +3089,7 @@ class DetailsForm extends preact.Component<{
 					onInput={this.changeNickname} onChange={this.changeNickname}
 				/></label></p>
 				<p><label class="label">Level: <input
-					name="level" value={set.level ?? ''} placeholder={`${editor.defaultLevel}`}
+					name="level" value={editor.isChampions ? 50 : set.level ?? ''} placeholder={`${editor.defaultLevel}`}
 					type="number" inputMode="numeric" min="1" max="100" step="1"
 					class="textbox inputform numform default-placeholder" style="width: 50px"
 					onInput={this.changeLevel} onChange={this.changeLevel} disabled={editor.isChampions}

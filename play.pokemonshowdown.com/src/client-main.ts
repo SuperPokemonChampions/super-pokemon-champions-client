@@ -497,7 +497,11 @@ class PSTeams extends PSStreamModel<'team' | 'format'> {
 		let format = bracketIndex > 0 ? line.slice(
 			(leftBracketIndex ? leftBracketIndex + 1 : 0), isBox ? bracketIndex - 4 : bracketIndex
 		) : 'gen9';
-		if (!format.startsWith('gen')) format = 'gen6' + format;
+		if (format.startsWith('gen6') && format.slice(4).includes('champions')) {
+			format = format.slice(4);
+		} else if (!format.startsWith('gen') && !format.includes('champions')) {
+			format = 'gen6' + format;
+		}
 		const name = line.slice(slashIndex + 1, pipeIndex);
 		const teamid = leftBracketIndex > 0 ? Number(line.slice(0, leftBracketIndex)) : undefined;
 		return {

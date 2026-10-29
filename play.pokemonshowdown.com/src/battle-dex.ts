@@ -268,13 +268,15 @@ export const Dex = new class implements ModdedDex {
 	formatGen(format: string) {
 		const formatid = toID(format);
 		if (!formatid) return Dex.gen;
+		if (formatid.includes('champions')) return 9;
 		if (!formatid.startsWith('gen')) return 6;
 		return parseInt(formatid.charAt(3)) || Dex.gen;
 	}
 	forFormat(format: string) {
 		let dex = Dex.forGen(Dex.formatGen(format));
 
-		const formatid = toID(format).slice(4);
+		const id = toID(format);
+		const formatid = id.startsWith('gen') ? id.slice(4) : id;
 		if (dex.gen === 7 && formatid.includes('letsgo')) {
 			dex = Dex.mod('gen7letsgo' as ID);
 		}
@@ -284,7 +286,7 @@ export const Dex = new class implements ModdedDex {
 		if (dex.gen === 9 && formatid.includes('legends')) {
 			dex = Dex.mod('gen9legendsou' as ID);
 		}
-		if (dex.gen === 9 && formatid.includes('champions')) {
+		if (formatid.includes('champions')) {
 			dex = Dex.mod('champions' as ID);
 		}
 		return dex;

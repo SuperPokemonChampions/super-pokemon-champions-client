@@ -21,6 +21,9 @@
 		},
 		focus: function () {
 			if (this.curTeam) {
+				if (this.curTeam.format.startsWith('gen6') && this.curTeam.format.slice(4).includes('champions')) {
+					this.curTeam.format = this.curTeam.format.slice(4);
+				}
 				this.curTeam.iconCache = '!';
 				this.curTeam.gen = this.getGen(this.curTeam.format);
 				this.curTeam.dex = Dex.forGen(this.curTeam.gen);
@@ -35,6 +38,9 @@
 				}
 				if (this.curTeam.format.includes('superchampions')) {
 					this.curTeam.dex = Dex.mod('superchampions');
+				}
+				if (this.curTeam.format.includes('champions')) {
+					for (var set of this.curSetList) set.level = 50;
 				}
 				Storage.activeSetList = this.curSetList;
 			}
@@ -752,6 +758,11 @@
 			}
 			i = +i;
 			this.curTeam = teams[i];
+			var normalizedChampionTeam = false;
+			if (this.curTeam.format.startsWith('gen6') && this.curTeam.format.slice(4).includes('champions')) {
+				this.curTeam.format = this.curTeam.format.slice(4);
+				normalizedChampionTeam = true;
+			}
 			this.curTeam.iconCache = '!';
 			this.curTeam.gen = this.getGen(this.curTeam.format);
 			this.curTeam.dex = Dex.forGen(this.curTeam.gen);
@@ -768,7 +779,14 @@
 				this.curTeam.dex = Dex.mod('superchampions');
 			}
 			Storage.activeSetList = this.curSetList = Storage.unpackTeam(this.curTeam.team);
+			if (this.curTeam.format.includes('champions')) {
+				for (var set of this.curSetList) {
+					if (set.level !== 50) normalizedChampionTeam = true;
+					set.level = 50;
+				}
+			}
 			this.curTeamIndex = i;
+			if (normalizedChampionTeam) this.save();
 			this.update();
 		},
 		"delete": function (i) {
@@ -1178,7 +1196,8 @@
 					var capacity = 6;
 					if (bracketIndex >= 0) {
 						format = name.substr(1, bracketIndex - 1);
-						if (format && format.slice(0, 3) !== 'gen') format = 'gen6' + format;
+						if (format && format.startsWith('gen6') && format.slice(4).includes('champions')) format = format.slice(4);
+						if (format && format.slice(0, 3) !== 'gen' && !format.includes('champions')) format = 'gen6' + format;
 						if (format && format.endsWith('-box')) {
 							format = format.slice(0, -4);
 							capacity = 50;
@@ -1623,6 +1642,7 @@
 			} });
 		},
 		changeFormat: function (format) {
+			if (format.startsWith('gen6') && format.slice(4).includes('champions')) format = format.slice(4);
 			this.curTeam.format = format;
 			this.curTeam.gen = this.getGen(this.curTeam.format);
 			this.curTeam.dex = Dex.forGen(this.curTeam.gen);
@@ -1637,6 +1657,9 @@
 			}
 			if (this.curTeam.format.includes('superchampions')) {
 				this.curTeam.dex = Dex.mod('superchampions');
+			}
+			if (this.curTeam.format.includes('champions')) {
+				for (var set of this.curSetList) set.level = 50;
 			}
 			this.save();
 			if (this.curTeam.gen === 5 && !Dex.loadedSpriteData['bw']) Dex.loadSpriteData('bw');
@@ -3717,6 +3740,7 @@
 		getGen: function (format) {
 			format = '' + format;
 			if (!format) return 7;
+			if (format.includes('champions')) return 9;
 			if (format.substr(0, 3) !== 'gen') return 6;
 			return parseInt(format.substr(3, 1), 10) || 6;
 		}

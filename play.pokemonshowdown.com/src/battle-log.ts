@@ -1137,7 +1137,10 @@ export class BattleLog {
 			return this.formatName(formatid.slice(0, atIndex), fixGen6) +
 				' (Custom rules: ' + this.escapeHTML(formatid.slice(atIndex + 3)) + ')';
 		}
-		if (fixGen6 && !formatid.startsWith('gen')) {
+		if (formatid.startsWith('gen6') && formatid.slice(4).includes('champions')) {
+			formatid = formatid.slice(4);
+		}
+		if (fixGen6 && !formatid.startsWith('gen') && !formatid.includes('champions')) {
 			formatid = `gen6${formatid}`;
 		}
 		let name = formatid;
