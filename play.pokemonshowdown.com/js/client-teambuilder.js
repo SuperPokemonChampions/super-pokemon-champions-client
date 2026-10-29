@@ -2227,7 +2227,7 @@
 				this.search.setType(type, this.curTeam.format || 'gen9', this.curSet, cur);
 				this.qInitial = q;
 				this.search.qName = this.curChartName;
-				if (wasIncomplete) {
+				if (wasIncomplete || q) {
 					if (this.search.find(q)) {
 						if (this.search.q) this.$chart.find('a').first().addClass('hover');
 					}
