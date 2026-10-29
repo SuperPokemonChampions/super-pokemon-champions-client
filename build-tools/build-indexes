@@ -287,8 +287,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const isVGC = ('' + genIdent).endsWith('.5');
 		const isGen9BH = genIdent === 9.9;
 		const isSSB = genIdent === 9.6;
-		const isChampions = genIdent === 9.67;
-		const isChampions = genIdent === 9.88;
+		const isChampions = genIdent === 9.67 || genIdent === 9.88;
 		const genNum = Math.floor(isDoubles ? -genIdent : genIdent);
 		const isBW1 = genIdent === 5.1;
 		const isRS = genIdent === 3.1;
@@ -382,6 +381,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					if (species.tier === 'LC') return 'LC';
 					return 'Regular';
 				}
+				if (isChampions && species.isNonstandard) return 'Illegal';
 				if (isRS) {
 					if (species.isNonstandard) {
 						if (species.isNonstandard === 'Unobtainable') return 'Unreleased';
