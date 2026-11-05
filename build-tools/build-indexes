@@ -23,6 +23,9 @@ console.log("DONE");
 const Dex = require('../caches/Super-Pokemon-Champions/dist/sim/dex').Dex;
 const CompoundWordNames = require('../caches/Super-Pokemon-Champions/dist/data/aliases').CompoundWordNames;
 const toID = Dex.toID;
+function getDataMod(mod) {
+	return mod.startsWith('gen9') ? 'champions' : mod;
+}
 process.stdout.write("Loading gen 9 data... ");
 Dex.includeData();
 console.log("DONE");
@@ -306,6 +309,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			if (isRS) genStr += 'rs';
 			if (isFRLG) genStr += 'frlg';
 			if (isChampions) genStr = 'champions';
+			if (genNum === 9 && !Dex.dexes[genStr]) genStr = 'champions';
 			return genStr;
 		})();
 		// process.stdout.write("" + gen + (isDoubles ? " doubles" : "") + "... ");
@@ -316,8 +320,8 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const metagameBans = {};
 		const nonstandardMoves = [];
 		for (const id of pokemon) {
-			const species = Dex.mod(gen).species.get(id);
-			const baseSpecies = Dex.mod(gen).species.get(species.baseSpecies);
+					const species = Dex.mod(getDataMod(gen)).species.get(id);
+					const baseSpecies = Dex.mod(getDataMod(gen)).species.get(species.baseSpecies);
 			if (species.gen > genNum) continue;
 			const speciesTier = (() => {
 				if (isMetBattle) {
@@ -357,7 +361,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					let tier = species.tier;
 					const lc = Dex.formats.get(gen + 'lc');
 					const lcBanlist = Dex.formats.getRuleTable(lc);
-					const prevoSpecies = Dex.mod(gen).species.get(species.prevo);
+					const prevoSpecies = Dex.mod(getDataMod(gen)).species.get(species.prevo);
 					if (!species.nfe || (prevoSpecies.exists && prevoSpecies.gen <= genNum) || lcBanlist.isBannedSpecies(species)) {
 						tier = 'Illegal';
 					}
@@ -488,8 +492,8 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		}
 
 		nonstandardMoves.push(...Object.keys(Dex.data.Moves).filter(id => {
-			const move = Dex.mod(isSSDLC1 ? 'gen8dlc1' : isPreDLC ? 'gen9predlc' : 'gen9dlc1').moves.get(id);
-			const bMove = Dex.mod(isSSDLC1 ? 'gen8' : 'gen9').moves.get(id);
+			const move = Dex.mod(getDataMod(isSSDLC1 ? 'gen8dlc1' : isPreDLC ? 'gen9predlc' : 'gen9dlc1')).moves.get(id);
+			const bMove = Dex.mod(getDataMod(isSSDLC1 ? 'gen8' : 'gen9')).moves.get(id);
 			return bMove.isNonstandard !== move.isNonstandard;
 		}));
 
@@ -658,7 +662,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const unreleasedItems = [];
 		if (genNum === 6) unreleasedItems.push(['header', "Unreleased"]);
 		for (const id of itemList) {
-			const item = Dex.mod(gen).items.get(id);
+			const item = Dex.mod(getDataMod(gen)).items.get(id);
 			if (item.gen > genNum) {
 				continue;
 			}
@@ -667,7 +671,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					let curItem = item;
 					let curGen = genNum;
 					while (curItem.isNonstandard && curGen >= 7) {
-						curItem = Dex.forGen(curGen).items.get(item.id);
+						curItem = Dex.mod(getDataMod('gen' + curGen)).items.get(item.id);
 						curGen--;
 					}
 					if (curItem.isNonstandard) continue;
@@ -1139,7 +1143,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			}
 		}
 	}
-	const PreDLCLearnsets = Dex.mod('gen9predlc').data.Learnsets;
+	const PreDLCLearnsets = Dex.mod(getDataMod('gen9predlc')).data.Learnsets;
 	for (const id in PreDLCLearnsets) {
 		const learnset = PreDLCLearnsets[id].learnset;
 		if (!learnset) continue;
@@ -1185,7 +1189,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			}
 		}
 	}
-	const SVDLC1Learnsets = Dex.mod('gen9dlc1').data.Learnsets;
+	const SVDLC1Learnsets = Dex.mod(getDataMod('gen9dlc1')).data.Learnsets;
 	for (const id in SVDLC1Learnsets) {
 		const learnset = SVDLC1Learnsets[id].learnset;
 		if (!learnset) continue;
@@ -1231,7 +1235,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			}
 		}
 	}
-	const LegendsZALearnsets = Dex.mod('gen9legendsou').data.Learnsets;
+	const LegendsZALearnsets = Dex.mod(getDataMod('gen9legendsou')).data.Learnsets;
 	for (const id in LegendsZALearnsets) {
 		const learnset = LegendsZALearnsets[id].learnset;
 		if (!learnset) continue;
@@ -1296,9 +1300,9 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	for (const genNum of [8, 7, 6, 5, 4, 3, 2, 1]) {
 		const gen = 'gen' + genNum;
 		const nextGen = 'gen' + (genNum + 1);
-		const genDex = Dex.mod(gen);
+		const genDex = Dex.mod(getDataMod(gen));
 		const genData = genDex.data;
-		const nextGenDex = Dex.mod(nextGen);
+		const nextGenDex = Dex.mod(getDataMod(nextGen));
 		const nextGenData = nextGenDex.data;
 
 		const overrideSpeciesData = {};
@@ -1379,9 +1383,9 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	for (const mod of [
 		'gen3rs', 'gen3frlg', 'gen5bw1', 'gen7letsgo', 'gen8bdsp', 'gen9ssb', 'gen9legendsou', 'champions',
 	]) {
-		const modDex = Dex.mod(mod);
+		const modDex = Dex.mod(getDataMod(mod));
 		const modData = modDex.data;
-		const parentDex = Dex.forGen(modDex.gen);
+		const parentDex = mod === 'champions' ? Dex : Dex.mod(getDataMod('gen' + modDex.gen));
 
 		const overrideSpeciesData = {};
 		BattleTeambuilderTable[mod].overrideSpeciesData = overrideSpeciesData;
