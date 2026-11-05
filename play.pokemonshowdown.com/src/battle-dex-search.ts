@@ -112,7 +112,11 @@ export class DexSearch {
 				this.results = [...this.prependResults, ...this.results];
 			}
 		} else {
-			this.results = this.textSearch(query);
+			if (this.typedSearch?.preserveBaseResultsForTextSearch()) {
+				this.results = this.typedSearch.getResults(this.filters, this.sortCol, this.reverseSort);
+			} else {
+				this.results = this.textSearch(query);
+			}
 		}
 		return true;
 	}
@@ -582,7 +586,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 
 	protected formatType: 'doubles' | 'bdsp' | 'bdspdoubles' | 'rs' | 'frlg' | 'bw1' | 'letsgo' | 'metronome' | 'natdex' |
 		'nfe' | 'ssdlc1' | 'ssdlc1doubles' | 'predlc' | 'predlcdoubles' | 'predlcnatdex' | 'svdlc1' | 'svdlc1doubles' |
-		'svdlc1natdex' | 'stadium' | 'lc' | 'legendsza' | 'champions' | null = null;
+		'svdlc1natdex' | 'stadium' | 'lc' | 'legendsza' | 'champions' | 'superchampions' | null = null;
 	isDoubles = false;
 
 	/**
@@ -971,6 +975,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 	abstract getDefaultResults(): SearchRow[];
 	abstract getBaseResults(): SearchRow[];
 	abstract filter(input: SearchRow, filters: string[][]): boolean;
+	preserveBaseResultsForTextSearch() { return false; }
 	defaultFilter?(input: SearchRow[]): SearchRow[];
 	abstract sort(input: SearchRow[], sortCol: string, reverseSort?: boolean): SearchRow[];
 }
@@ -1040,8 +1045,6 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 		let table = BattleTeambuilderTable;
 		if ((format.endsWith('cap') || format.endsWith('caplc')) && dex.gen < 9) {
 			table = table[`gen${dex.gen}`];
-		} else if (this.formatType === 'champions') {
-			table = table[`champions`];
 		} else if (isVGCOrBS) {
 			table = table[`gen${dex.gen}vgc`];
 		} else if (dex.gen === 9 && isHackmons && !this.formatType) {
@@ -1310,6 +1313,9 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 }
 
 class BattleAbilitySearch extends BattleTypedSearch<'ability'> {
+	override preserveBaseResultsForTextSearch() {
+		return this.formatType === 'champions' && !!this.species;
+	}
 	getTable() {
 		return BattleAbilities;
 	}

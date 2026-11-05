@@ -348,6 +348,11 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 		case 'tera':
 			choices.current.tera = checkbox.checked;
 			break;
+		case 'dodge':
+			choices.current.dodge = checkbox.checked;
+			choices.dodgeEnabled = checkbox.checked;
+			this.props.room.battle.dodgeEnabled = checkbox.checked;
+			break;
 		}
 		this.props.room.update(null);
 	};
@@ -410,7 +415,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 			return;
 		case 'error':
 			if (args[1].startsWith('[Invalid choice]') && room.request) {
-				room.choices = new BattleChoiceBuilder(room.request);
+				room.choices = new BattleChoiceBuilder(room.request, room.battle.dodgeEnabled);
 				room.update(null);
 			}
 			break;
@@ -445,7 +450,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 		}
 
 		room.request = request;
-		room.choices = new BattleChoiceBuilder(request);
+		room.choices = new BattleChoiceBuilder(request, room.battle.dodgeEnabled);
 		this.notifyRequest();
 		room.update(null);
 	}
@@ -579,6 +584,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 		const canZMove = moveRequest.zMoves && !choices.alreadyZ;
 		const canUltraBurst = moveRequest.canUltraBurst;
 		const canTerastallize = moveRequest.canTerastallize;
+		const canDodge = moveRequest.canDodge !== undefined;
 
 		const maybeDisabled = moveRequest.maybeDisabled;
 		const maybeLocked = moveRequest.maybeLocked;
@@ -621,6 +627,10 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				{canTerastallize && <label class={`megaevo${choices.current.tera ? ' cur' : ''}`}>
 					<input type="checkbox" name="tera" checked={choices.current.tera} onChange={this.toggleBoostedMove} /> {}
 					Terastallize<br /><span dangerouslySetInnerHTML={{ __html: Dex.getTypeIcon(canTerastallize) }} />
+				</label>}
+				{canDodge && <label class={`megaevo${choices.dodgeEnabled ? ' cur' : ''}`}>
+					<input type="checkbox" name="dodge" checked={choices.dodgeEnabled} disabled={!moveRequest.canDodge} onChange={this.toggleBoostedMove} /> {}
+					Dodge it! (3 uses)
 				</label>}
 			</div>
 		</div>;
@@ -909,7 +919,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 		let choices = room.choices;
 		if (!choices) return 'Error: Missing BattleChoiceBuilder';
 		if (choices.request !== request) {
-			choices = new BattleChoiceBuilder(request);
+			choices = new BattleChoiceBuilder(request, room.battle.dodgeEnabled);
 			room.choices = choices;
 		}
 

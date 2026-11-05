@@ -443,7 +443,7 @@ export class Pokemon implements PokemonDetails, PokemonHealth {
 			return '' + goodBoostTable[this.boosts[boostStat]] + '&nbsp;' + boostStatTable[boostStat];
 		}
 		let badBoostTable = [
-			'1&times;', '8.5&times;', '0.67&times;', '0.6&times;', '0.5&times;', '0.45&times;', '0.4&times;',
+			'1&times;', '0.85&times;', '0.67&times;', '0.6&times;', '0.5&times;', '0.45&times;', '0.4&times;',
 			'0.37&times;', '0.33&times;', '0.31&times;', '0.29&times;', '0.27&times;', '0.25&times;',
 		];
 		// let badBoostTable = ['Normal', '&minus;1', '&minus;2', '&minus;3', '&minus;4', '&minus;5', '&minus;6'];
@@ -705,7 +705,7 @@ export class Side {
 		this.id = toID(this.name);
 		if (avatar) {
 			this.setAvatar(avatar);
-		} else {
+		} else if (this.avatar === 'unknown') {
 			this.rollTrainerSprites();
 			if (this.foe && this.avatar === this.foe.avatar) this.rollTrainerSprites();
 		}
@@ -1064,6 +1064,7 @@ export interface ServerPokemon extends PokemonDetails, PokemonHealth {
 
 export class Battle {
 	scene: BattleSceneStub;
+	dodgeEnabled = false;
 
 	viewpointSwitched = false;
 

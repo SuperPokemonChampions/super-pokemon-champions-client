@@ -55,6 +55,7 @@ export interface BattleRequestActivePokemon {
 	canMegaEvoY?: boolean;
 	canUltraBurst?: boolean;
 	canTerastallize?: string;
+	canDodge?: boolean;
 	trapped?: boolean;
 	maybeTrapped?: boolean;
 	maybeDisabled?: boolean;
@@ -113,6 +114,7 @@ interface BattleMoveChoice {
 	max: boolean;
 	// gen 9
 	tera: boolean;
+	dodge: boolean;
 }
 interface BattleSwitchChoice {
 	choiceType: 'switch' | 'team';
@@ -148,16 +150,20 @@ export class BattleChoiceBuilder {
 		z: false,
 		max: false,
 		tera: false,
+		dodge: false,
 	};
 	alreadySwitchingIn: number[] = [];
 	alreadyMega = false;
 	alreadyMax = false;
 	alreadyZ = false;
 	alreadyTera = false;
+	dodgeEnabled = false;
 
-	constructor(request: BattleRequest) {
+	constructor(request: BattleRequest, dodgeEnabled = false) {
 		this.request = request;
 		this.noCancel = request.noCancel || request.requestType === 'wait';
+		this.dodgeEnabled = dodgeEnabled;
+		this.current.dodge = dodgeEnabled && request.requestType === 'move' && !!request.active[0]?.canDodge;
 		this.fillPasses();
 	}
 
@@ -249,6 +255,7 @@ export class BattleChoiceBuilder {
 				z: false,
 				max: false,
 				tera: false,
+				dodge: false,
 			};
 		} else if (choice.choiceType === 'switch' || choice.choiceType === 'team') {
 			if (this.currentMoveRequest()?.trapped) {
@@ -364,6 +371,7 @@ export class BattleChoiceBuilder {
 				z: false,
 				max: false,
 				tera: false,
+				dodge: false,
 			};
 			while (true) {
 				// If data ends with a number, treat it as a target location.
@@ -401,6 +409,9 @@ export class BattleChoiceBuilder {
 				} else if (choice.endsWith(' terastal')) {
 					current.tera = true;
 					choice = choice.slice(0, -9);
+				} else if (choice.endsWith(' dodge')) {
+					current.dodge = true;
+					choice = choice.slice(0, -6);
 				} else {
 					break;
 				}
@@ -543,7 +554,8 @@ export class BattleChoiceBuilder {
 			(choice.megay ? ' megay' : '') +
 			(choice.ultra ? ' ultra' : '') +
 			(choice.z ? ' zmove' : '') +
-			(choice.tera ? ' terastallize' : '');
+			(choice.tera ? ' terastallize' : '') +
+			(choice.dodge ? ' dodge' : '');
 	}
 
 	/**
