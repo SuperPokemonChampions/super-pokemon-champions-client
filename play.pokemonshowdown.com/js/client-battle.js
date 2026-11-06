@@ -755,7 +755,7 @@
 					checkboxes.push('<label class="megaevo"><input type="checkbox" name="terastallize" />&nbsp;Terastallize<br />' + Dex.getTypeIcon(canTerastallize) + '</label>');
 				}
 				if (curActive.canDodge !== undefined) {
-					checkboxes.push('<label class="megaevo"><input type="checkbox" name="dodge" ' + (curActive.canDodge ? '' : 'disabled="disabled"') + ' />&nbsp;Dodge it! (3 uses)</label>');
+					checkboxes.push('<label class="megaevo"><input type="checkbox" name="dodge" ' + (curActive.canDodge ? '' : 'disabled="disabled"') + ' />&nbsp;Dodge it! (' + curActive.canDodge + ' ' + (curActive.canDodge === 1 ? 'use' : 'uses') + ' left)</label>');
 				}
 				if (checkboxes.length) {
 					moveMenu += '<div class="megaevo-box">' + checkboxes.join('') + '</div>';

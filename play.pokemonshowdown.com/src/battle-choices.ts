@@ -55,7 +55,7 @@ export interface BattleRequestActivePokemon {
 	canMegaEvoY?: boolean;
 	canUltraBurst?: boolean;
 	canTerastallize?: string;
-	canDodge?: boolean;
+	canDodge?: number;
 	trapped?: boolean;
 	maybeTrapped?: boolean;
 	maybeDisabled?: boolean;

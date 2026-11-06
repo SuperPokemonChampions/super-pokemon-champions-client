@@ -630,7 +630,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				</label>}
 				{canDodge && <label class={`megaevo${choices.dodgeEnabled ? ' cur' : ''}`}>
 					<input type="checkbox" name="dodge" checked={choices.dodgeEnabled} disabled={!moveRequest.canDodge} onChange={this.toggleBoostedMove} /> {}
-					Dodge it! (3 uses)
+					Dodge it! ({moveRequest.canDodge} {moveRequest.canDodge === 1 ? 'use' : 'uses'} left)
 				</label>}
 			</div>
 		</div>;
