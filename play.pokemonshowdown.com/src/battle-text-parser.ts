@@ -881,7 +881,7 @@ export class BattleTextParser {
 
 		case '-message': {
 			if (args[1] === 'Take a Break' && args[2]) {
-				return `  Take a Break: "${this.pokemon(args[2])} restored HP."\n`;
+				return `  "Take a Break!" ${this.pokemon(args[2])} restored HP.\n`;
 			}
 			let [, message] = args;
 			return '  ' + message + '\n';
