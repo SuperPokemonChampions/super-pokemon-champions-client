@@ -1523,8 +1523,8 @@ export class BattleTooltips {
 			maxpp = (move.pp === 1 || move.noPPBoosts ? move.pp : move.pp * 8 / 5);
 			if (this.battle.gen < 3) maxpp = Math.min(61, maxpp);
 			if (toID(this.battle.tier).includes('champions')) {
-				let pp = move.pp > 20 ? 20 : move.pp;
-				maxpp = (pp === 1 || move.noPPBoosts) ? pp : (pp / 5 + 1) * 4;
+				const basePP = move.id === 'airslash' ? 12 : move.id === 'nightdaze' ? 8 : Math.min(move.pp, 20);
+				maxpp = (basePP === 1 || move.noPPBoosts) ? basePP : Math.floor(basePP * 8 / 5);
 			}
 		}
 		const bullet = moveName.startsWith('*') || move.isZ ? '<span style="color:#888">&#8226;</span>' : '&#8226;';
