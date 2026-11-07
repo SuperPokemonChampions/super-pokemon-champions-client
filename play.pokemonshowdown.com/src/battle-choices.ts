@@ -56,6 +56,7 @@ export interface BattleRequestActivePokemon {
 	canUltraBurst?: boolean;
 	canTerastallize?: string;
 	canDodge?: number;
+	dodgeActive?: boolean;
 	trapped?: boolean;
 	maybeTrapped?: boolean;
 	maybeDisabled?: boolean;
@@ -162,7 +163,7 @@ export class BattleChoiceBuilder {
 	constructor(request: BattleRequest, dodgeEnabled = false) {
 		this.request = request;
 		this.noCancel = request.noCancel || request.requestType === 'wait';
-		this.dodgeEnabled = dodgeEnabled && request.requestType === 'move' && !!request.active[0]?.canDodge;
+		this.dodgeEnabled = dodgeEnabled && request.requestType === 'move' && (request.active[0]?.canDodge ?? 0) > 0;
 		this.current.dodge = this.dodgeEnabled;
 		this.fillPasses();
 	}
