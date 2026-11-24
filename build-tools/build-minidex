@@ -91,13 +91,7 @@ function updateSizes() {
 	fs.writeFileSync('data/pokedex-mini-bw.js', g5buf);
 }
 
-if (fs.existsSync('sprites/ani/')) {
-	updateSizes();
-	console.log('DONE');
-} else {
-	try {
-		fs.unlinkSync('data/pokedex-mini.js');
-		fs.unlinkSync('data/pokedex-mini-bw.js');
-	} catch {}
-	console.log('SKIPPED');
-}
+// Sprite files may be served by a proxy instead of stored on this machine.
+// The HTML still loads both metadata files, so always generate valid JS.
+updateSizes();
+console.log(fs.existsSync('sprites/ani/') ? 'DONE' : 'DONE (sprite dimensions unavailable locally)');
