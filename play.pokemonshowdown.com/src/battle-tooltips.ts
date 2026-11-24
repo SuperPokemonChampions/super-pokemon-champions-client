@@ -1083,7 +1083,7 @@ export class BattleTooltips {
 			const clientStatName = clientPokemon.boosts.spc && (statName === 'spa' || statName === 'spd') ? 'spc' : statName;
 			const boostLevel = clientPokemon.boosts[clientStatName];
 			if (boostLevel) {
-				let boostTable = [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
+				let boostTable = this.battle.dex.modid === 'champions' ? Array.from({ length: 13 }, (_, i) => 1 + i / 8) : [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
 				if (boostLevel > 0) {
 					stats[statName] *= boostTable[boostLevel];
 				} else {
@@ -1644,6 +1644,11 @@ export class BattleTooltips {
 		// can happen in obscure situations
 		if (!pokemon) return [moveType, category];
 
+		if (this.battle.dex.modid === 'champions' && move.id.startsWith('hiddenpower')) {
+			const stats = this.calculateModifiedStats(pokemon, serverPokemon);
+			category = stats.atk > stats.spa ? 'Physical' : 'Special';
+			if (pokemon.getSpecies().baseSpecies === 'Unown') moveType = '???';
+		}
 		let pokemonTypes = pokemon.getTypeList(serverPokemon);
 		value.reset();
 		if (move.id === 'revelationdance') {
@@ -2398,7 +2403,7 @@ export class BattleTooltips {
 			}
 		}
 		// Moves which have base power changed according to weight
-		if (['lowkick', 'grassknot', 'heavyslam', 'heatcrash'].includes(move.id) && this.battle.gen > 2) {
+		if ((['lowkick', 'grassknot', 'heavyslam', 'heatcrash'].includes(move.id) || (this.battle.dex.modid === 'champions' && move.id === 'bodyslam')) && this.battle.gen > 2) {
 			let isGKLK = ['lowkick', 'grassknot'].includes(move.id);
 			if (target) {
 				let targetWeight = target.getWeightKg();
@@ -2472,7 +2477,7 @@ export class BattleTooltips {
 		}
 		for (let i = 1; i <= 5 && i <= pokemon.side.faintCounter; i++) {
 			if (pokemon.volatiles[`fallen${i}`]) {
-				value.abilityModify(1 + 0.1 * i, "Supreme Overlord");
+				value.abilityModify(1 + (this.battle.dex.modid === 'champions' ? 0.05 : 0.1) * i, "Supreme Overlord");
 			}
 		}
 		if (target) {

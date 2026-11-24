@@ -163,8 +163,8 @@ export class BattleChoiceBuilder {
 	constructor(request: BattleRequest, dodgeEnabled = false) {
 		this.request = request;
 		this.noCancel = request.noCancel || request.requestType === 'wait';
-		this.dodgeEnabled = dodgeEnabled && request.requestType === 'move' && (request.active[0]?.canDodge ?? 0) > 0;
-		this.current.dodge = this.dodgeEnabled;
+		this.dodgeEnabled = dodgeEnabled;
+		this.current.dodge = dodgeEnabled && request.requestType === 'move' && (request.active[0]?.canDodge ?? 0) > 0 && !request.active[0]?.dodgeActive;
 		this.fillPasses();
 	}
 

@@ -416,6 +416,11 @@ export class Pokemon implements PokemonDetails, PokemonHealth {
 		if (!this.boosts[boostStat]) {
 			return '1&times;&nbsp;' + boostStatTable[boostStat];
 		}
+		if (this.side.battle.dex.modid === 'champions') {
+			const stage = Math.max(-12, Math.min(12, this.boosts[boostStat]));
+			const multiplier = boostStat === 'accuracy' || boostStat === 'evasion' ? 1 + Math.abs(stage) / 3 : 1 + Math.abs(stage) / 8;
+			return (stage < 0 ? 1 / multiplier : multiplier).toFixed(2) + '&times;&nbsp;' + boostStatTable[boostStat];
+		}
 		if (this.boosts[boostStat] > 6) this.boosts[boostStat] = 6;
 		if (this.boosts[boostStat] < -6) this.boosts[boostStat] = -6;
 		const isRBY = this.side.battle.gen <= 1 && !this.side.battle.tier.includes('Stadium');
@@ -934,6 +939,7 @@ export class Side {
 	}
 	switchOut(pokemon: Pokemon, kwArgs: KWArgs, slot = pokemon.slot) {
 		const effect = Dex.getEffect(kwArgs.from);
+		pokemon.sprite?.removeEffect('leechseed' as ID, true);
 		if (!['batonpass', 'zbatonpass'].includes(effect.id) &&
 			!(this.battle.tier.includes(`Relay Race`) && !effect.id)) {
 			pokemon.clearVolatile();

@@ -53,6 +53,7 @@
 		},
 		events: {
 			'click .replayDownloadButton': 'clickReplayDownloadButton',
+			'change input[name=dodge]': 'updateDodge',
 			'change input[name=megaevox]': 'uncheckMegaEvoY',
 			'change input[name=megaevoy]': 'uncheckMegaEvoX',
 			'change input[name=zmove]': 'updateZMove',
@@ -755,7 +756,7 @@
 					checkboxes.push('<label class="megaevo"><input type="checkbox" name="terastallize" />&nbsp;Terastallize<br />' + Dex.getTypeIcon(canTerastallize) + '</label>');
 				}
 				if (curActive.canDodge !== undefined) {
-					checkboxes.push('<label class="megaevo"><input type="checkbox" name="dodge" ' + (curActive.canDodge ? '' : 'disabled="disabled"') + ' />&nbsp;Dodge it! (' + curActive.canDodge + ' ' + (curActive.canDodge === 1 ? 'use' : 'uses') + ' left)</label>');
+					checkboxes.push('<label class="megaevo"><input type="checkbox" name="dodge" ' + (this.battle.dodgeEnabled ? 'checked="checked" ' : '') + (curActive.canDodge && !curActive.dodgeActive ? '' : 'disabled="disabled"') + ' />&nbsp;Dodge it! (' + curActive.canDodge + ' ' + (curActive.canDodge === 1 ? 'use' : 'uses') + ' left)</label>');
 				}
 				if (checkboxes.length) {
 					moveMenu += '<div class="megaevo-box">' + checkboxes.join('') + '</div>';
@@ -1281,6 +1282,7 @@
 		},
 
 		// choice buttons
+		updateDodge: function (e) { this.battle.dodgeEnabled = !!e.currentTarget.checked; },
 		chooseMove: function (pos, e) {
 			if (!this.choice) return;
 			this.tooltips.hideTooltip();
@@ -1294,7 +1296,8 @@
 				var isUltraBurst = !!(this.$('input[name=ultraburst]')[0] || '').checked;
 				var isDynamax = !!(this.$('input[name=dynamax]')[0] || '').checked;
 				var isTerastal = !!(this.$('input[name=terastallize]')[0] || '').checked;
-				var isDodge = !!(this.$('input[name=dodge]')[0] || '').checked;
+				var dodgeCheckbox = this.$('input[name=dodge]')[0];
+				var isDodge = !!(dodgeCheckbox && dodgeCheckbox.checked && !dodgeCheckbox.disabled);
 
 				var target = e.getAttribute('data-target');
 				var choosableTargets = { normal: 1, any: 1, adjacentAlly: 1, adjacentAllyOrSelf: 1, adjacentFoe: 1 };

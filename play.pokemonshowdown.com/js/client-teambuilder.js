@@ -1239,6 +1239,16 @@
 				buf += '<input class="textbox teamnameedit" type="text" class="teamnameedit" size="30" value="' + BattleLog.escapeHTML(this.curTeam.name) + '" /> ';
 				buf += '<button name="import" class="button"><i class="fa fa-upload"></i> Import/Export</button> ';
 				buf += '<div class="teamchartbox">';
+				if (this.curTeam.format === 'superchampionssingles6v6') {
+					var teamDex = this.curTeam.dex;
+					var teamBST = this.curSetList.reduce(function (total, set) {
+						var species = teamDex.species.get(set.species);
+						if (species.baseSpecies === 'Zygarde' && toID(set.ability) === 'powerconstruct') species = teamDex.species.get('Zygarde-Complete');
+						if (species.baseSpecies === 'Palafin' && toID(set.ability) === 'zerotohero') species = teamDex.species.get('Palafin-Hero');
+						return total + species.bst;
+					}, 0);
+					buf += '<p>Team BST: ' + teamBST + ' / 3150</p>';
+				}
 				buf += '<ol class="teamchart">';
 				buf += '<li>' + this.clipboardHTML() + '</li>';
 				var i = 0;
@@ -1317,6 +1327,9 @@
 			if (baseFormat.substr(-5) === 'draft') baseFormat = baseFormat.substr(0, baseFormat.length - 5);
 			var species = this.curTeam.dex.species.get(set.species);
 			var isSuperChampions = baseFormat.includes('superchampions');
+			var bstSpecies = species;
+			if (isSuperChampions && species.baseSpecies === 'Zygarde' && toID(set.ability) === 'powerconstruct') bstSpecies = this.curTeam.dex.species.get('Zygarde-Complete');
+			if (isSuperChampions && species.baseSpecies === 'Palafin' && toID(set.ability) === 'zerotohero') bstSpecies = this.curTeam.dex.species.get('Palafin-Hero');
 			var isLetsGo = baseFormat.includes('letsgo');
 			var isBDSP = baseFormat.includes('bdsp');
 			var isNatDex = baseFormat.includes('nationaldex') || baseFormat.includes('natdex');
@@ -2493,7 +2506,7 @@
 							}
 						}
 					}
-					if (hpType && !this.canHyperTrain(set)) {
+					if (hpType && !this.curTeam.format.includes('champions') && !this.canHyperTrain(set)) {
 						var hpIVs;
 						switch (hpType) {
 						case 'dark':
@@ -2782,6 +2795,7 @@
 				}
 			}
 			if (!hasHiddenPower) return;
+			if (this.curTeam.format.includes('champions')) return;
 			var hpTypes = ['Fighting', 'Flying', 'Poison', 'Ground', 'Rock', 'Bug', 'Ghost', 'Steel', 'Fire', 'Water', 'Grass', 'Electric', 'Psychic', 'Ice', 'Dragon', 'Dark'];
 			var hpType;
 			if (this.curTeam.gen <= 2) {
@@ -2996,12 +3010,12 @@
 				buf += '</select></div></div>';
 			}
 
-			if (!isLetsGo && (this.curTeam.gen === 7 || isNatDex || (isBDSP && species.baseSpecies === 'Unown'))) {
+			if (isSuperChampions || (!isLetsGo && (this.curTeam.gen === 7 || isNatDex || (isBDSP && species.baseSpecies === 'Unown')))) {
 				buf += '<div class="formrow"><label class="formlabel" title="Hidden Power Type">Hidden Power:</label><div><select name="hptype" class="button">';
 				buf += '<option value=""' + (!set.hpType ? ' selected="selected"' : '') + '>(automatic type)</option>'; // unset
 				var types = Dex.types.all();
 				for (var i = 0; i < types.length; i++) {
-					if (types[i].HPivs) {
+					if (types[i].HPivs || (isSuperChampions && types[i].name === 'Fairy')) {
 						buf += '<option value="' + types[i].name + '"' + (set.hpType === types[i].name ? ' selected="selected"' : '') + '>' + types[i].name + '</option>';
 					}
 				}
@@ -3539,7 +3553,8 @@
 			var minSpe;
 			if (resetSpeed) minSpe = false;
 			if (moveName.substr(0, 13) === 'Hidden Power ') {
-				if (!this.canHyperTrain(set)) {
+				if (this.curTeam.format.includes('champions')) set.hpType = moveName.substr(13);
+				if (!this.curTeam.format.includes('champions') && !this.canHyperTrain(set)) {
 					var hpType = moveName.substr(13);
 
 					set.ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };

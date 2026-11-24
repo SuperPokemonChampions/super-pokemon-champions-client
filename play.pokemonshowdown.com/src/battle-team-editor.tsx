@@ -988,6 +988,12 @@ export class TeamEditor extends preact.Component<{
 		}
 
 		return <div class="teameditor">
+			{editor.format === 'superchampionssingles6v6' && <p class="team-totals">Team BST: {editor.sets.reduce((total, set) => {
+				let species = editor.dex.species.get(set.species);
+				if (species.baseSpecies === 'Palafin' && toID(set.ability) === 'zerotohero') species = editor.dex.species.get('Palafin-Hero');
+				if (species.baseSpecies === 'Zygarde' && toID(set.ability) === 'powerconstruct') species = editor.dex.species.get('Zygarde-Complete');
+				return total + species.bst;
+			}, 0)} / 3150</p>}
 			<ul class="tabbar">
 				<li><button onClick={this.setTab} value="wizard" class={`button${this.wizard ? ' cur' : ''}`}>
 					Wizard
@@ -3154,12 +3160,12 @@ class DetailsForm extends preact.Component<{
 						)}
 					</p>
 				)}
-				{((!editor.isLetsGo && editor.gen === 7) || editor.isNatDex || species.baseSpecies === 'Unown') && <p>
+				{(editor.isChampions || (!editor.isLetsGo && editor.gen === 7) || editor.isNatDex || species.baseSpecies === 'Unown') && <p>
 					<label class="label">Hidden Power Type: <select
 						name="hptype" class="button" onChange={this.changeHPType} value={editor.getHPType(set)}
 					>
 						{Dex.types.all().map(type => (
-							type.HPivs && <option value={type.name}>
+							(type.HPivs || (editor.isChampions && type.name === 'Fairy')) && <option value={type.name}>
 								{type.name}
 							</option>
 						))}

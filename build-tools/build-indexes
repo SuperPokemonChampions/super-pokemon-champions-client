@@ -52,8 +52,8 @@ function requireNoCache(pathSpec) {
 	let index = [];
 
 	index = index.concat(Object.keys(Dex.data.Pokedex).map(x => x + ' pokemon'));
-	index = index.concat(Object.keys(Dex.data.Moves).map(x => x + ' move'));
-	index = index.concat(Object.keys(Dex.data.Items).map(x => x + ' item'));
+	index = index.concat([...new Set([...Object.keys(Dex.data.Moves), ...Object.keys(Dex.mod('champions').data.Moves)])].map(x => x + ' move'));
+	index = index.concat([...new Set([...Object.keys(Dex.data.Items), ...Object.keys(Dex.mod('champions').data.Items)])].map(x => x + ' item'));
 	index = index.concat(Object.keys(Dex.data.Abilities).map(x => x + ' ability'));
 	index = index.concat(Object.keys(Dex.data.TypeChart).map(x => toID(x) + ' type'));
 	index = index.concat(['physical', 'special', 'status'].map(x => toID(x) + ' category'));
@@ -651,7 +651,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			if (formatSlices['DUU'] === undefined) formatSlices['DUU'] = formatSlices['New'];
 		}
 
-		const itemList = Object.keys(Dex.data.Items);
+		const itemList = Object.keys(Dex.mod(getDataMod(gen)).data.Items);
 		itemList.sort();
 
 		const greatItems = [['header', "Popular items"]];
@@ -1288,7 +1288,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	];
 	const overrideMoveKeys = [
 		'accuracy', 'basePower', 'category', 'desc', 'flags', 'isNonstandard', 'pp', 'priority', 'secondary', 'secondaries',
-		'shortDesc', 'target', 'type',
+		'shortDesc', 'target', 'type', 'noPPBoosts',
 	];
 	const overrideAbilityKeys = ['desc', 'flags', 'isNonstandard', 'rating', 'shortDesc'];
 	const overrideItemKeys = ['desc', 'fling', 'isNonstandard', 'naturalGift', 'shortDesc'];
@@ -1481,8 +1481,10 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
 
 {
 	const Moves = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/moves.js').Moves;
+	for (const id in Dex.mod('champions').data.Moves) if (!(id in Moves)) Moves[id] = { ...Dex.mod('champions').moves.get(id) };
+
 	for (const id in Moves) {
-		const move = Dex.moves.get(Moves[id].name);
+		const move = Dex.moves.get(Moves[id].name).exists ? Dex.moves.get(Moves[id].name) : Dex.mod('champions').moves.get(Moves[id].name);
 		if (move.desc) Moves[id].desc = move.desc;
 		if (move.shortDesc) Moves[id].shortDesc = move.shortDesc;
 		if (move.basePowerCallback) Moves[id].basePowerCallback = true;
@@ -1498,8 +1500,11 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
 
 {
 	const Items = requireNoCache('../caches/Super-Pokemon-Champions/dist/data/items.js').Items;
+	for (const id in Dex.mod('champions').data.Items) {
+		if (!(id in Items)) Items[id] = { ...Dex.mod('champions').items.get(id) };
+	}
 	for (const id in Items) {
-		const item = Dex.items.get(Items[id].name);
+		const item = Dex.items.get(Items[id].name).exists ? Dex.items.get(Items[id].name) : Dex.mod('champions').items.get(Items[id].name);
 		if (item.desc) Items[id].desc = item.desc;
 		if (item.shortDesc) Items[id].shortDesc = item.shortDesc;
 	}

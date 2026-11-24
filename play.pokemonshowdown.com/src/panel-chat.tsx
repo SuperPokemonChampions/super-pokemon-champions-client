@@ -585,7 +585,7 @@ export class ChatRoom extends PSRoom {
 				// we _could_ check choices.noCancel, but the server will check anyway
 				this.sendDirect('/undo');
 			}
-			room.choices = new BattleChoiceBuilder(room.request);
+			room.choices = new BattleChoiceBuilder(room.request, room.battle.dodgeEnabled);
 			this.update(null);
 		},
 		'move,switch,team,pass,shift,choose'(target, cmd) {
