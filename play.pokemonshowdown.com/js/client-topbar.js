@@ -914,7 +914,7 @@
 				buf += '<p class="error">' + BattleLog.escapeHTML(data.error) + '</p>';
 				if (data.error.indexOf('inappropriate') >= 0) {
 					// log out so we don't autologin to a bad name if we refresh
-					$.post(app.user.getActionPHP(), {
+					$.post(app.user.getActionPHP('logout'), {
 						act: 'logout',
 						userid: app.user.get('userid')
 					});
@@ -1002,7 +1002,7 @@
 			this.$el.html(buf);
 		},
 		submit: function (data) {
-			$.post(app.user.getActionPHP(), {
+			$.post(app.user.getActionPHP('changepassword'), {
 				act: 'changepassword',
 				oldpassword: data.oldpassword,
 				password: data.password,
@@ -1042,7 +1042,7 @@
 		submit: function (data) {
 			var name = data.name;
 			var captcha = data.captcha;
-			$.post(app.user.getActionPHP(), {
+			$.post(app.user.getActionPHP('register'), {
 				act: 'register',
 				username: name,
 				password: data.password,

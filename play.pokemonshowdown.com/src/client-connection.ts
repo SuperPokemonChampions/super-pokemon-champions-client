@@ -400,7 +400,7 @@ export const PSLoginServer = new class {
 		// 	return Promise.resolve(null);
 		// }
 		data.act = act;
-		let url = '/~~' + PS.server.id + '/action.php';
+		let url = '/api/' + encodeURIComponent(act) + '?serverid=' + encodeURIComponent(PS.server.id);
 		if (location.pathname.endsWith('.html')) {
 			url = 'https://' + Config.routes.client + url;
 			if (typeof POKEMON_SHOWDOWN_TESTCLIENT_KEY === 'string') {

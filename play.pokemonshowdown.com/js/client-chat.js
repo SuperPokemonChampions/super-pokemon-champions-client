@@ -981,7 +981,7 @@
 				}
 
 				var self = this;
-				$.get(app.user.getActionPHP(), {
+				$.get(app.user.getActionPHP('ladderget'), {
 					act: 'ladderget',
 					user: targets[0]
 				}, Storage.safeJSON(function (data) {

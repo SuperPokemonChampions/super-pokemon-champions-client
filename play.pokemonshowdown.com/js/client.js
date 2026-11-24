@@ -212,18 +212,13 @@ function toId() {
 			}
 		},
 		/**
-		 * Return the path to the login server `action.php` file. AJAX requests
-		 * to this file will always be made on the `play.pokemonshowdown.com`
-		 * domain in order to have access to the correct cookies.
+		 * Return the supported login API route. Self-hosted clients proxy this
+		 * path through nginx so account cookies remain on the client origin.
 		 */
-		getActionPHP: function () {
-			var ret = '/~~' + Config.server.id + '/action.php';
-			if (Config.testclient) {
-				ret = 'https://' + Config.routes.client + ret;
-			}
-			return (this.getActionPHP = function () {
-				return ret;
-			})();
+		getActionPHP: function (action) {
+			var ret = '/api/' + encodeURIComponent(action) + '?serverid=' + encodeURIComponent(Config.server.id);
+			if (Config.testclient) ret = 'https://' + Config.routes.client + ret;
+			return ret;
 		},
 		/**
 		 * Process a signed assertion returned from the login server.
@@ -288,7 +283,7 @@ function toId() {
 
 			if (this.get('userid') !== userid) {
 				var self = this;
-				$.post(this.getActionPHP(), {
+				$.post(this.getActionPHP('getassertion'), {
 					act: 'getassertion',
 					userid: userid,
 					challstr: this.challstr
@@ -301,7 +296,7 @@ function toId() {
 		},
 		passwordRename: function (name, password, special) {
 			var self = this;
-			$.post(this.getActionPHP(), {
+			$.post(this.getActionPHP('login'), {
 				act: 'login',
 				name: name,
 				pass: password,
@@ -342,7 +337,7 @@ function toId() {
 				 */
 				this.challstr = challstr;
 				var self = this;
-				$.post(this.getActionPHP(), {
+				$.post(this.getActionPHP('upkeep'), {
 					act: 'upkeep',
 					challstr: this.challstr
 				}, Storage.safeJSON(function (data) {
@@ -369,7 +364,7 @@ function toId() {
 		 * Log out from the server (but remain connected as a guest).
 		 */
 		logout: function () {
-			$.post(this.getActionPHP(), {
+			$.post(this.getActionPHP('logout'), {
 				act: 'logout',
 				userid: this.get('userid')
 			});
@@ -976,7 +971,7 @@ function toId() {
 			if (!this.loadingTeam) {
 				var app = this;
 				this.loadingTeam = true;
-				$.get(app.user.getActionPHP(), {
+				$.get(app.user.getActionPHP('getteam'), {
 					act: 'getteam',
 					teamid: team.teamid
 				}, Storage.safeJSON(function (data) {
@@ -1169,7 +1164,7 @@ function toId() {
 
 				var userid = toUserid(parsed.name);
 				if (userid === this.user.get('userid') && parsed.name !== this.user.get('name')) {
-					$.post(app.user.getActionPHP(), {
+					$.post(app.user.getActionPHP('changeusername'), {
 						act: 'changeusername',
 						username: parsed.name
 					}, function () {}, 'text');
@@ -1500,7 +1495,7 @@ function toId() {
 			var serverid = Config.server.id && toID(Config.server.id.split(':')[0]);
 			var silent = data.silent;
 			if (serverid && serverid !== 'showdown') id = serverid + '-' + id;
-			$.post(app.user.getActionPHP(), {
+			$.post(app.user.getActionPHP('uploadreplay'), {
 				act: 'uploadreplay',
 				log: data.log,
 				serverid: serverid,
