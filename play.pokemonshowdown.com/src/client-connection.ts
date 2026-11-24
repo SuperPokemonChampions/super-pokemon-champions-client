@@ -465,6 +465,11 @@ class NetRequest {
 				uri += (uri.includes('?') ? '&' : '?') + Net.encodeQuery(opts.query);
 			}
 			xhr.open(opts.method || 'GET', uri);
+			if (/(?:^|\/)api\//.test(uri)) {
+				xhr.timeout = 15000;
+				xhr.ontimeout = () => reject(new HttpError("The account service did not respond within 15 seconds", 0, ""));
+				xhr.onerror = () => reject(new HttpError("Could not connect to the account service", 0, ""));
+			}
 			xhr.onreadystatechange = function () {
 				const DONE = 4;
 				if (xhr.readyState === DONE) {

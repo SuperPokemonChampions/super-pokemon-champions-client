@@ -220,6 +220,19 @@ function toId() {
 			if (Config.testclient) ret = 'https://' + Config.routes.client + ret;
 			return ret;
 		},
+		requestLogin: function (action, data, success, silent) {
+			var self = this;
+			return $.ajax({
+				url: this.getActionPHP(action), type: 'POST', data: data,
+				dataType: 'text', timeout: 15000
+			}).done(success).fail(function (xhr, status) {
+				self.loaded = true;
+				if (app.topbar) app.topbar.updateUserbar();
+				if (!silent && status !== 'abort') {
+					app.addPopupMessage('The account authentication service is not responding. You are still connected to the game as a guest. Please try signing in again shortly.');
+				}
+			});
+		},
 		/**
 		 * Process a signed assertion returned from the login server.
 		 * Emits the following events (arguments in brackets):
@@ -283,7 +296,7 @@ function toId() {
 
 			if (this.get('userid') !== userid) {
 				var self = this;
-				$.post(this.getActionPHP('getassertion'), {
+				this.requestLogin('getassertion', {
 					act: 'getassertion',
 					userid: userid,
 					challstr: this.challstr
@@ -296,7 +309,7 @@ function toId() {
 		},
 		passwordRename: function (name, password, special) {
 			var self = this;
-			$.post(this.getActionPHP('login'), {
+			this.requestLogin('login', {
 				act: 'login',
 				name: name,
 				pass: password,
@@ -315,11 +328,11 @@ function toId() {
 					}
 					app.addPopup(LoginPasswordPopup, {
 						username: name,
-						error: data.error || 'Wrong password.',
+						error: data && (data.error || data.actionerror) || 'Wrong password.',
 						special: special
 					});
 				}
-			}), 'text');
+			}));
 		},
 		challstr: '',
 		receiveChallstr: function (challstr) {
@@ -337,7 +350,7 @@ function toId() {
 				 */
 				this.challstr = challstr;
 				var self = this;
-				$.post(this.getActionPHP('upkeep'), {
+				this.requestLogin('upkeep', {
 					act: 'upkeep',
 					challstr: this.challstr
 				}, Storage.safeJSON(function (data) {
@@ -357,17 +370,17 @@ function toId() {
 						});
 					}
 					self.finishRename(data.username, data.assertion);
-				}), 'text');
+				}), true);
 			}
 		},
 		/**
 		 * Log out from the server (but remain connected as a guest).
 		 */
 		logout: function () {
-			$.post(this.getActionPHP('logout'), {
+			this.requestLogin('logout', {
 				act: 'logout',
 				userid: this.get('userid')
-			});
+			}, undefined, true);
 			app.send('/logout');
 			app.trigger('init:socketclosed', "You have been logged out and disconnected.<br /><br />If you wanted to change your name while staying connected, use the 'Change Name' button or the '/nick' command.", false);
 			app.socket.close();

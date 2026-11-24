@@ -24,3 +24,34 @@ describe('Login API routing', () => {
   }
  });
 });
+
+describe('Login request failures', () => {
+ const body = /requestLogin: function \(action, data, success, silent\) \{([\s\S]*?)\n\t\t\},/.exec(source)[1];
+ function setup() {
+  let options, failure, successCalls = 0, popups = 0, updates = 0;
+  const context = {
+   $: {ajax: opts => {options = opts; return {done: () => ({fail: callback => {failure = callback;}})};}},
+   app: {topbar: {updateUserbar: () => updates++}, addPopupMessage: () => popups++},
+  };
+  const request = vm.runInNewContext('(function(action, data, success, silent) {' + body + '})', context);
+  const user = {loaded: false, getActionPHP: action => '/api/' + action};
+  return {run: silent => request.call(user, 'login', {}, () => successCalls++, silent),
+   fail: () => failure({status:522}, 'error'),
+   get state() {return {options, successCalls, popups, updates, user};}};
+ }
+ it('caps login requests at 15 seconds and reports failure without accepting a login', () => {
+  const request = setup(); request.run(false);
+  assert.equal(request.state.options.timeout,15000);
+  assert.equal(request.state.options.type,'POST');
+  request.fail();
+  assert.equal(request.state.popups,1);
+  assert.equal(request.state.successCalls,0);
+  assert.equal(request.state.user.loaded,true);
+ });
+ it('lets failed background session checks finish without an unsolicited popup', () => {
+  const request = setup(); request.run(true); request.fail();
+  assert.equal(request.state.popups,0);
+  assert.equal(request.state.updates,1);
+  assert.equal(request.state.user.loaded,true);
+ });
+});

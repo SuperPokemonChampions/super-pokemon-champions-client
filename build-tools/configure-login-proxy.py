@@ -3,6 +3,7 @@
 
 import datetime
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -21,17 +22,36 @@ API_LOCATION = """
         proxy_cookie_domain .pokemonshowdown.com $host;
         proxy_cookie_path / /;
         proxy_cache off;
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 15s;
+        proxy_read_timeout 15s;
     }
+"""
+
+STATIC_COMPRESSION = """
+    # Compress large generated client data files.
+    gzip on;
+    gzip_vary on;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_types application/javascript application/json text/css text/plain image/svg+xml;
 """
 
 
 def add_api_proxy(config):
-    if "location ^~ /api/" in config or "location /api/" in config:
-        raise ValueError("An /api/ location already exists; inspect it before changing it.")
     marker = "root /opt/super-pokemon-champions-client/play.pokemonshowdown.com;"
     if config.count(marker) != 1 or "server_name pokemonshowdownclient.duckdns.org;" not in config:
         raise ValueError("This is not the expected Champions client nginx site; no changes made.")
-    return config.replace(marker, marker + "\n" + API_LOCATION, 1)
+    owned_location = r"(?m)^[ \t]*# Official account authentication API \(same origin for browser cookies\)\.\n[ \t]*location \^~ /api/ \{[^{}]*\n[ \t]*\}"
+    if re.search(owned_location, config):
+        config = re.sub(owned_location, lambda _: API_LOCATION.strip("\n"), config, count=1)
+    elif "location ^~ /api/" in config or "location /api/" in config:
+        raise ValueError("An independently configured /api/ location exists; no changes made.")
+    else:
+        config = config.replace(marker, marker + "\n" + API_LOCATION, 1)
+    if not re.search(r"(?m)^\s*gzip\s+", config):
+        config = config.replace(marker, marker + "\n" + STATIC_COMPRESSION, 1)
+    return config
 
 
 def main():
@@ -52,7 +72,7 @@ def main():
         site.write_text(original)
         print("Restored original nginx configuration.", flush=True)
         raise
-    print("Login API proxy installed; game and WebSocket routes preserved.")
+    print("Login timeouts and static compression configured; game and WebSocket routes preserved.")
 
 
 if __name__ == "__main__":
