@@ -6,7 +6,30 @@ for (const [name, file] of [['BattlePokedex','pokedex'], ['BattleMovedex','moves
 require('../play.pokemonshowdown.com/js/battle-dex-data.js');
 require('../play.pokemonshowdown.com/js/battle-dex.js');
 vm.runInThisContext(fs.readFileSync(require.resolve('../play.pokemonshowdown.com/js/battle-choices.js'),'utf8'));
+vm.runInThisContext(fs.readFileSync(require.resolve('../play.pokemonshowdown.com/js/battle-dex-search.js'),'utf8'));
 describe('Champions client patch', () => {
+ it('shows Taunt as legal in the actual Clodsire move picker', () => {
+  const search = new DexSearch('move', 'superchampionssingles6v6', 'clodsire');
+  const moves = search.typedSearch.getBaseResults();
+  assert(moves.some(row => row[0] === 'move' && row[1] === 'taunt'));
+  assert(search.typedSearch.canLearn('clodsire', 'taunt'));
+  assert(!search.typedSearch.canLearn('clodsire', 'spore'));
+ });
+ it('includes universal Taunt in every generated Champions learnset', () => {
+  for (const [species, learnset] of Object.entries(BattleTeambuilderTable.champions.learnsets)) {
+   assert(learnset.taunt?.includes('9'), species);
+  }
+ });
+ it('describes Parting Shot and Shadow Tag effects without substituting PP', () => {
+  const dex = Dex.mod('champions');
+  const move = dex.moves.get('partingshot');
+  assert.equal(move.pp, 8);
+  assert.equal(move.noPPBoosts, true);
+  assert.match(move.shortDesc, /Atk and Sp\. Atk by 2/);
+  assert.match(move.desc, /Attack and Special Attack by 2 stages/);
+  assert(!/\bPP\b/.test(move.shortDesc + move.desc));
+  assert.match(dex.abilities.get('shadowtag').shortDesc, /2 turns/);
+ });
  it('shows exact PP, power and accuracy from Champions overrides', () => {
   const dex = Dex.mod('champions');
   for (const [id,pp] of [['airslash',12],['bodyslam',12],['bind',8],['metalclaw',16],['return',8],['dragonrage',8],['seismictoss',8]]) {
