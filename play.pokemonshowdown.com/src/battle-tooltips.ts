@@ -1083,7 +1083,7 @@ export class BattleTooltips {
 			const clientStatName = clientPokemon.boosts.spc && (statName === 'spa' || statName === 'spd') ? 'spc' : statName;
 			const boostLevel = clientPokemon.boosts[clientStatName];
 			if (boostLevel) {
-				let boostTable = this.battle.dex.modid === 'champions' ? Array.from({ length: 13 }, (_, i) => 1 + i / 8) : [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
+				let boostTable = [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4];
 				if (boostLevel > 0) {
 					stats[statName] *= boostTable[boostLevel];
 				} else {

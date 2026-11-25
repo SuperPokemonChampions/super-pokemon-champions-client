@@ -418,7 +418,7 @@ export class Pokemon implements PokemonDetails, PokemonHealth {
 		}
 		if (this.side.battle.dex.modid === 'champions') {
 			const stage = Math.max(-12, Math.min(12, this.boosts[boostStat]));
-			const multiplier = boostStat === 'accuracy' || boostStat === 'evasion' ? 1 + Math.abs(stage) / 3 : 1 + Math.abs(stage) / 8;
+			const multiplier = boostStat === 'accuracy' || boostStat === 'evasion' ? 1 + Math.abs(stage) / 3 : 1 + Math.abs(stage) / 4;
 			return (stage < 0 ? 1 / multiplier : multiplier).toFixed(2) + '&times;&nbsp;' + boostStatTable[boostStat];
 		}
 		if (this.boosts[boostStat] > 6) this.boosts[boostStat] = 6;
