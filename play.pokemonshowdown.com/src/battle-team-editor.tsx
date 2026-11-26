@@ -993,7 +993,7 @@ export class TeamEditor extends preact.Component<{
 				if (species.baseSpecies === 'Palafin' && toID(set.ability) === 'zerotohero') species = editor.dex.species.get('Palafin-Hero');
 				if (species.baseSpecies === 'Zygarde' && toID(set.ability) === 'powerconstruct') species = editor.dex.species.get('Zygarde-Complete');
 				return total + species.bst;
-			}, 0)} / 3150</p>}
+			}, 0)} / 3050</p>}
 			<ul class="tabbar">
 				<li><button onClick={this.setTab} value="wizard" class={`button${this.wizard ? ' cur' : ''}`}>
 					Wizard

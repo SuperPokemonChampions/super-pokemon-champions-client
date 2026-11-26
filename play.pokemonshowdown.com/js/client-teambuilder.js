@@ -1247,7 +1247,7 @@
 						if (species.baseSpecies === 'Palafin' && toID(set.ability) === 'zerotohero') species = teamDex.species.get('Palafin-Hero');
 						return total + species.bst;
 					}, 0);
-					buf += '<p>Team BST: ' + teamBST + ' / 3150</p>';
+					buf += '<p>Team BST: ' + teamBST + ' / 3050</p>';
 				}
 				buf += '<ol class="teamchart">';
 				buf += '<li>' + this.clipboardHTML() + '</li>';
