@@ -8,6 +8,22 @@ require('../play.pokemonshowdown.com/js/battle-dex.js');
 vm.runInThisContext(fs.readFileSync(require.resolve('../play.pokemonshowdown.com/js/battle-choices.js'),'utf8'));
 vm.runInThisContext(fs.readFileSync(require.resolve('../play.pokemonshowdown.com/js/battle-dex-search.js'),'utf8'));
 describe('Champions client patch', () => {
+ it('shows the base ability selection for Charizardite X', () => {
+  const search = new DexSearch();
+  search.setType('ability', 'superchampionssingles6v6', {species: 'Charizard', item: 'Charizardite X'});
+  const rows = search.typedSearch.getBaseResults();
+  assert(rows.some(([type, text]) => type === 'html' && /Solar Power.*Levitate/.test(text)));
+  assert(rows.some(([type, id]) => type === 'ability' && id === 'solarpower'));
+ });
+ it('shows current stat, ability and PP data from the server', () => {
+  const dex = Dex.mod('champions');
+  assert.deepEqual(dex.species.get('gengar').abilities, {0: 'Cursed Body', 1: 'Levitate'});
+  assert.equal(dex.species.get('scyther').baseStats.spa, 50);
+  for (const [id, pp] of Object.entries({revivalblessing: 1, sketch: 1, encore: 8, closecombat: 8, recover: 8, earthquake: 12, icebeam: 16, shadowball: 16, tackle: 20})) {
+   assert.equal(dex.moves.get(id).pp, pp, id);
+   assert.equal(dex.moves.get(id).noPPBoosts, true, id);
+  }
+ });
  it('shows Taunt as legal in the actual Clodsire move picker', () => {
   const search = new DexSearch('move', 'superchampionssingles6v6', 'clodsire');
   const moves = search.typedSearch.getBaseResults();

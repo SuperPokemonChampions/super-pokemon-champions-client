@@ -1336,7 +1336,14 @@ class BattleAbilitySearch extends BattleTypedSearch<'ability'> {
 		let species = dex.species.get(this.species);
 		let abilitySet: SearchRow[] = [['header', "Abilities"]];
 
-		if (species.isMega) {
+		const item = dex.items.get(this.set?.item || '');
+		const mega = species.isMega ? species : dex.species.get(item.megaStone?.[species.baseSpecies] || '');
+		if (this.formatType === 'champions' && mega.abilities['1'] === 'Levitate' &&
+			mega.baseSpecies === species.baseSpecies) {
+			species = dex.species.get(mega.baseSpecies);
+			const alternate = species.abilities['1'] || species.abilities['H'];
+			abilitySet.unshift(['html', `Choose <strong>${alternate}</strong> for Levitate after Mega Evolution. Choose ${species.abilities['0']} for ${mega.abilities['0']}.`]);
+		} else if (species.isMega) {
 			abilitySet.unshift(['html', `Will be <strong>${species.abilities['0']}</strong> after Mega Evolving.`]);
 			species = dex.species.get(species.baseSpecies);
 		}
